@@ -1,0 +1,92 @@
+[
+    {
+      "id": 1,
+      "title": "Tomate",
+      "description": "Verdura roja",
+      "price": 50,
+      "img": "Sin imagen",
+      "code": "abc123",
+      "stock": 30
+    },
+    {
+      "id": 2,
+      "title": "Arroz",
+      "description": "Arroz blanco",
+      "price": 70,
+      "img": "sin imagen",
+      "code": "abc124",
+      "stock": 50
+    },
+    {
+        "id": 3,
+        "title": "Fideo",
+        "description": "Largo",
+        "price": 10,
+        "img": "sin imagen",
+        "code": "abc125",
+        "stock": 80
+      },
+      {
+        "id": 4,
+        "title": "Banana",
+        "description": "Fruta amarilla",
+        "price": 20,
+        "img": "sin imagen",
+        "code": "abc126",
+        "stock": 60
+      },
+      {
+        "id": 5,
+        "title": "Pescado",
+        "description": "Carne",
+        "price": 30,
+        "img": "sin imagen",
+        "code": "abc127",
+        "stock": 70
+      },
+      {
+        "id": 6,
+        "title": "Pepas",
+        "description": "Galletas",
+        "price": 60,
+        "img": "sin imagen",
+        "code": "abc128",
+        "stock": 40
+      },
+      {
+        "id": 7,
+        "title": "Agua",
+        "description": "Bebida",
+        "price": 40,
+        "img": "sin imagen",
+        "code": "abc129",
+        "stock": 90
+      },
+      {
+        "id": 8,
+        "title": "Gin",
+        "description": "Bebida alcoholica",
+        "price": 90,
+        "img": "sin imagen",
+        "code": "abc130",
+        "stock": 10
+      },
+      {
+        "id": 9,
+        "title": "Azucar",
+        "description": "Blanco",
+        "price": 80,
+        "img": "sin imagen",
+        "code": "abc131",
+        "stock": 100
+      },
+      {
+        "id": 10,
+        "title": "Lechuga",
+        "description": "Verdura verde",
+        "price": 100,
+        "img": "sin imagen",
+        "code": "abc132",
+        "stock": 20
+      }
+  ]
