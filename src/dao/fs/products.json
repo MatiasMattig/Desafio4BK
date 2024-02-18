@@ -1,0 +1,26 @@
+[
+  {
+    "title": "wefwe",
+    "description": "wefwf",
+    "price": "2",
+    "img": "Sin wfwefagen",
+    "code": "wefwef",
+    "stock": "3",
+    "category": "wefwef",
+    "status": true,
+    "thumbnails": [],
+    "id": 2
+  },
+  {
+    "title": "SDAW",
+    "description": "EFWF",
+    "price": "3",
+    "img": "Sin ImagenWEFF",
+    "code": "WEFF",
+    "stock": "4",
+    "category": "WEFWE",
+    "status": true,
+    "thumbnails": [],
+    "id": 3
+  }
+]
