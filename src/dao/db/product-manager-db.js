@@ -1,6 +1,5 @@
 const ProductModel = require("../models/product.model.js");
 
-
 class ProductManager {
 
     async addProduct({ title, description, price, img, code, stock, category, thumbnails }) {
@@ -11,9 +10,9 @@ class ProductManager {
                 return;
             }
 
-            const existeProducto = await ProductModel.findOne({ code: code });
+            const existsProduct = await ProductModel.findOne({ code: code });
 
-            if (existeProducto) {
+            if (existsProduct) {
                 console.log("El código debe ser único");
                 return;
             }
@@ -55,7 +54,7 @@ class ProductManager {
                 }
             }
 
-            const productos = await ProductModel
+            const products = await ProductModel
                 .find(queryOptions)
                 .sort(sortOptions)
                 .skip(skip)
@@ -68,7 +67,7 @@ class ProductManager {
             const hasNextPage = page < totalPages;
 
             return {
-                docs: productos,
+                docs: products,
                 totalPages,
                 prevPage: hasPrevPage ? page - 1 : null,
                 nextPage: hasNextPage ? page + 1 : null,
@@ -86,32 +85,32 @@ class ProductManager {
 
     async getProductById(id) {
         try {
-            const producto = await ProductModel.findById(id);
+            const product = await ProductModel.findById(id);
 
-            if (!producto) {
+            if (!product) {
                 console.log("Producto no encontrado");
                 return null;
             }
 
             console.log("Producto encontrado");
-            return producto;
+            return product;
         } catch (error) {
             console.log("Error al traer un producto por id");
         }
     }
 
-    async updateProduct(id, productoActualizado) {
+    async updateProduct(id, productUpdated) {
         try {
 
-            const updateado = await ProductModel.findByIdAndUpdate(id, productoActualizado);
+            const updated = await ProductModel.findByIdAndUpdate(id, productUpdated);
 
-            if (!updateado) {
+            if (!updated) {
                 console.log("No se encuentra el producto");
                 return null;
             }
 
             console.log("Producto actualizado con exito");
-            return updateado;
+            return updated;
         } catch (error) {
             console.log("Error al actualizar el producto", error);
 
@@ -121,9 +120,9 @@ class ProductManager {
     async deleteProduct(id) {
         try {
 
-            const deleteado = await ProductModel.findByIdAndDelete(id);
+            const deleted = await ProductModel.findByIdAndDelete(id);
 
-            if (!deleteado) {
+            if (!deleted) {
                 console.log("No se encuentra el producto");
                 return null;
             }

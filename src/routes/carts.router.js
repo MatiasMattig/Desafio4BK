@@ -4,40 +4,35 @@ const CartManager = require("../dao/db/cart-manager-db.js");
 const cartManager = new CartManager();
 const CartModel = require("../dao/models/cart.model.js");
 
-
-//1) Creamos un nuevo carrito: 
-
 router.post("/", async (req, res) => {
     try {
-        const nuevoCarrito = await cartManager.crearCarrito();
-        res.json(nuevoCarrito);
+        const newCart = await cartManager.createCart();
+        res.json(newCart);
     } catch (error) {
         console.error("Error al crear un nuevo carrito", error);
         res.status(500).json({ error: "Error interno del servidor" });
     }
 });
 
-//2) Listamos los productos que pertenecen a determinado carrito. 
+// Listamos los productos que pertenecen a determinado carrito. 
 
 router.get("/:cid", async (req, res) => {
     const cartId = req.params.cid;
 
     try {
-        const carrito = await CartModel.findById(cartId)
+        const cart = await CartModel.findById(cartId)
             
-        if (!carrito) {
+        if (!cart) {
             console.log("No existe ese carrito con el id");
             return res.status(404).json({ error: "Carrito no encontrado" });
         }
 
-        return res.json(carrito.products);
+        return res.json(cart.products);
     } catch (error) {
         console.error("Error al obtener el carrito", error);
         res.status(500).json({ error: "Error interno del servidor" });
     }
 });
-
-//3) Agregar productos a distintos carritos.
 
 router.post("/:cid/product/:pid", async (req, res) => {
     const cartId = req.params.cid;
@@ -45,25 +40,20 @@ router.post("/:cid/product/:pid", async (req, res) => {
     const quantity = req.body.quantity || 1;
 
     try {
-        const actualizarCarrito = await cartManager.agregarProductoAlCarrito(cartId, productId, quantity);
-        res.json(actualizarCarrito.products);
+        const updateCart = await cartManager.addProductToCart(cartId, productId, quantity);
+        res.json(updateCart.products);
     } catch (error) {
         console.error("Error al agregar producto al carrito", error);
         res.status(500).json({ error: "Error interno del servidor" });
     }
 });
 
-
-///Segunda Entrega: 
-
-//4) Eliminamos un producto especifico del carrito: 
-
 router.delete('/:cid/product/:pid', async (req, res) => {
     try {
         const cartId = req.params.cid;
         const productId = req.params.pid;
 
-        const updatedCart = await cartManager.eliminarProductoDelCarrito(cartId, productId);
+        const updatedCart = await cartManager.removeProductFromCart(cartId, productId);
 
         res.json({
             status: 'success',
@@ -79,15 +69,14 @@ router.delete('/:cid/product/:pid', async (req, res) => {
     }
 });
 
-//5) Actualizamos productos del carrito: 
+// Actualizamos productos del carrito: 
 
 router.put('/:cid', async (req, res) => {
     const cartId = req.params.cid;
     const updatedProducts = req.body;
-    // Debes enviar un arreglo de productos en el cuerpo de la solicitud
 
     try {
-        const updatedCart = await cartManager.actualizarCarrito(cartId, updatedProducts);
+        const updatedCart = await cartManager.updateCart(cartId, updatedProducts);
         res.json(updatedCart);
     } catch (error) {
         console.error('Error al actualizar el carrito', error);
@@ -98,16 +87,13 @@ router.put('/:cid', async (req, res) => {
     }
 });
 
-
-//6) Actualizamos las cantidades de productos
-
 router.put('/:cid/product/:pid', async (req, res) => {
     try {
         const cartId = req.params.cid;
         const productId = req.params.pid;
         const newQuantity = req.body.quantity;
 
-        const updatedCart = await cartManager.actualizarCantidadDeProducto(cartId, productId, newQuantity);
+        const updatedCart = await cartManager.updateProductQuantity(cartId, productId, newQuantity);
 
         res.json({
             status: 'success',
@@ -123,13 +109,13 @@ router.put('/:cid/product/:pid', async (req, res) => {
     }
 });
 
-//7) Vaciamos el carrito: 
+// Vaciamos el carrito: 
 
 router.delete('/:cid', async (req, res) => {
     try {
         const cartId = req.params.cid;
         
-        const updatedCart = await cartManager.vaciarCarrito(cartId);
+        const updatedCart = await cartManager.emptyCart(cartId);
 
         res.json({
             status: 'success',

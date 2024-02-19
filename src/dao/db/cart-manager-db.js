@@ -1,53 +1,53 @@
 const CartModel = require("../models/cart.model.js");
 
 class CartManager {
-    async crearCarrito() {
+    async createCart() {
         try {
-            const nuevoCarrito = new CartModel({products:[]});
-            await nuevoCarrito.save();
-            return nuevoCarrito;
+            const newCart = new CartModel({products:[]});
+            await newCart.save();
+            return newCart;
         } catch(error){
             console.log("Error al crear el nuevo carrito de compras");
         }
     }
 
-    async getCarritoById(cartId) {
+    async getCartById(cartId) {
         try {
-            const carrito = await CartModel.findById(cartId);
-            if(!carrito){
+            const cart = await CartModel.findById(cartId);
+            if(!cart){
                 console.log("No existe ese carrito con el id");
                 return null;
             }
 
-            return carrito;
+            return cart;
         } catch(error){
             console.log("Error al traer el carrito", error);
         }
     }
 
-    async agregarProductoAlCarrito(cartId, productId, quantity = 1) {
+    async addProductToCart(cartId, productId, quantity = 1) {
         try {
-            const carrito = await this.getCarritoById(cartId);
-            const existeProducto = carrito.products.find(item => item.product.toString() === productId);
+            const cart = await this.getCartById(cartId);
+            const existsProduct = cart.products.find(item => item.product.toString() === productId);
 
-            if(existeProducto){
-                existeProducto.quantity += quantity;
+            if(existsProduct){
+                existsProduct.quantity += quantity;
             }else{
-                carrito.products.push({ product: productId, quantity });
+                cart.products.push({ product: productId, quantity });
             }
 
-            //Vamos a marcar la propiedad "products" como modificada antes de guardar: 
-            carrito.markModified("products");
+            //Marcamos la propiedad "products" como modificada antes de guardar
+            cart.markModified("products");
 
-            await carrito.save();
-            return carrito;
+            await cart.save();
+            return cart;
 
         } catch (error) {
             console.log("Error al agregar un producto", error);
         }
     }
 
-    async eliminarProductoDelCarrito(cartId, productId) {
+    async removeProductFromCart(cartId, productId) {
         try {
             const cart = await CartModel.findById(cartId);
 
@@ -67,7 +67,7 @@ class CartManager {
         }
     }
 
-    async actualizarCarrito(cartId, updatedProducts) {
+    async updateCart(cartId, updatedProducts) {
         try {
             const cart = await CartModel.findById(cartId);
 
@@ -88,7 +88,7 @@ class CartManager {
         }
     }
 
-    async actualizarCantidadDeProducto(cartId, productId, newQuantity) {
+    async updateProductQuantity(cartId, productId, newQuantity) {
         try {
             const cart = await CartModel.findById(cartId);
 
@@ -115,7 +115,7 @@ class CartManager {
         }
     }
 
-    async vaciarCarrito(cartId) {
+    async emptyCart(cartId) {
         try {
             const cart = await CartModel.findByIdAndUpdate(
                 cartId,

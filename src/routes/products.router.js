@@ -3,13 +3,11 @@ const router = express.Router();
 const ProductManager = require("../dao/db/product-manager-db.js");
 const productManager = new ProductManager();
 
-//Modificacion 2 entrega: 
-
 router.get("/", async (req, res) => {
     try {
         const { limit = 10, page = 1, sort, query } = req.query;
 
-        const productos = await productManager.getProducts({
+        const products = await productManager.getProducts({
             limit: parseInt(limit),
             page: parseInt(page),
             sort,
@@ -18,15 +16,15 @@ router.get("/", async (req, res) => {
 
         res.json({
             status: 'success',
-            payload: productos,
-            totalPages: productos.totalPages,
-            prevPage: productos.prevPage,
-            nextPage: productos.nextPage,
-            page: productos.page,
-            hasPrevPage: productos.hasPrevPage,
-            hasNextPage: productos.hasNextPage,
-            prevLink: productos.hasPrevPage ? `/api/products?limit=${limit}&page=${productos.prevPage}&sort=${sort}&query=${query}` : null,
-            nextLink: productos.hasNextPage ? `/api/products?limit=${limit}&page=${productos.nextPage}&sort=${sort}&query=${query}` : null,
+            payload: products,
+            totalPages: products.totalPages,
+            prevPage: products.prevPage,
+            nextPage: products.nextPage,
+            page: products.page,
+            hasPrevPage: products.hasPrevPage,
+            hasNextPage: products.hasNextPage,
+            prevLink: products.hasPrevPage ? `/api/products?limit=${limit}&page=${products.prevPage}&sort=${sort}&query=${query}` : null,
+            nextLink: products.hasNextPage ? `/api/products?limit=${limit}&page=${products.nextPage}&sort=${sort}&query=${query}` : null,
         });
 
     } catch (error) {
@@ -38,20 +36,18 @@ router.get("/", async (req, res) => {
     }
 });
 
-//2) Traer solo un producto por id: 
-
 router.get("/:pid", async (req, res) => {
     const id = req.params.pid;
 
     try {
-        const producto = await productManager.getProductById(id);
-        if (!producto) {
+        const product = await productManager.getProductById(id);
+        if (!product) {
             return res.json({
                 error: "Producto no encontrado"
             });
         }
 
-        res.json(producto);
+        res.json(product);
     } catch (error) {
         console.error("Error al obtener producto", error);
         res.status(500).json({
@@ -60,14 +56,11 @@ router.get("/:pid", async (req, res) => {
     }
 });
 
-
-//3) Agregar nuevo producto: 
-
 router.post("/", async (req, res) => {
-    const nuevoProducto = req.body;
+    const newProduct = req.body;
 
     try {
-        await productManager.addProduct(nuevoProducto);
+        await productManager.addProduct(newProduct);
         res.status(201).json({
             message: "Producto agregado exitosamente"
         });
@@ -79,13 +72,12 @@ router.post("/", async (req, res) => {
     }
 });
 
-//4) Actualizar por ID
 router.put("/:pid", async (req, res) => {
     const id = req.params.pid;
-    const productoActualizado = req.body;
+    const productUpdated = req.body;
 
     try {
-        await productManager.updateProduct(id, productoActualizado);
+        await productManager.updateProduct(id, productUpdated);
         res.json({
             message: "Producto actualizado exitosamente"
         });
@@ -96,8 +88,6 @@ router.put("/:pid", async (req, res) => {
         });
     }
 });
-
-//5) Eliminar producto: 
 
 router.delete("/:pid", async (req, res) => {
     const id = req.params.pid;
