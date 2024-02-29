@@ -1,4 +1,5 @@
 const CartModel = require("../models/cart.model.js");
+const ProductModel = require("../models/product.model.js");
 
 class CartManager {
     async createCart() {
@@ -27,45 +28,59 @@ class CartManager {
 
     async addProductToCart(cartId, productId, quantity = 1) {
         try {
+            // Verificar si el producto existe en la base de datos
+            const productExists = await ProductModel.findById(productId);
+            
+            if (!productExists) {
+                throw new Error("El producto que intenta agregar no existe.");
+            }
+    
+            // Obtener el carrito
             const cart = await this.getCartById(cartId);
-            const existsProduct = cart.products.find(item => item.product.toString() === productId);
-
-            if(existsProduct){
-                existsProduct.quantity += quantity;
-            }else{
+            
+            // Verificar si el producto ya está en el carrito
+            const existingProductIndex = cart.products.findIndex(item => item.product.toString() === productId);
+    
+            if (existingProductIndex !== -1) {
+                // Si el producto ya está en el carrito, actualizar la cantidad
+                cart.products[existingProductIndex].quantity += quantity;
+            } else {
+                // Si el producto no está en el carrito, agregarlo
                 cart.products.push({ product: productId, quantity });
             }
-
-            //Marcamos la propiedad "products" como modificada antes de guardar
+    
+            // Marcar la propiedad "products" como modificada antes de guardar
             cart.markModified("products");
-
+    
+            // Guardar el carrito actualizado
             await cart.save();
             return cart;
-
+    
         } catch (error) {
-            console.log("Error al agregar un producto", error);
+            console.log("Error al agregar un producto", error.message);
+            // Aquí podrías lanzar el error para que el controlador o el cliente puedan manejarlo adecuadamente
+            throw error;
         }
-    }
+    }    
 
     async removeProductFromCart(cartId, productId) {
         try {
             const cart = await CartModel.findById(cartId);
-
+    
             if (!cart) {
                 throw new Error('Carrito no encontrado');
             }
-
-
-            cart.products = cart.products.filter(item => item.product.toString() !== productId);
-
+    
+            cart.products = cart.products.filter(item => item.product._id.toString() !== productId);
+    
             await cart.save();
-
+    
             return cart;
         } catch (error) {
             console.error('Error al eliminar el producto del carrito en el gestor', error);
             throw error;
         }
-    }
+    }    
 
     async updateCart(cartId, updatedProducts) {
         try {
@@ -96,7 +111,7 @@ class CartManager {
                 throw new Error('Carrito no encontrado');
             }
 
-            const productIndex = cart.products.findIndex(item => item.product.toString() === productId);
+            const productIndex = cart.products.findIndex(item => item.product._id.toString() === productId);
 
             if (productIndex !== -1) {
                 cart.products[productIndex].quantity = newQuantity;

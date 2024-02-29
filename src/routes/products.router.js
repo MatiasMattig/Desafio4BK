@@ -5,11 +5,21 @@ const productManager = new ProductManager();
 
 router.get("/", async (req, res) => {
     try {
-        const { limit = 10, page = 1, sort, query } = req.query;
+        let { limit = 10, page = 1, sort, query } = req.query;
+
+        // Validar que limit y page sean números positivos
+        limit = parseInt(limit);
+        page = parseInt(page);
+
+        if (isNaN(limit) || limit <= 0 || isNaN(page) || page <= 0) {
+            return res.status(400).json({
+                error: "Los parámetros 'limit' y 'page' deben ser números positivos."
+            });
+        }
 
         const products = await productManager.getProducts({
-            limit: parseInt(limit),
-            page: parseInt(page),
+            limit,
+            page,
             sort,
             query,
         });
@@ -42,7 +52,7 @@ router.get("/:pid", async (req, res) => {
     try {
         const product = await productManager.getProductById(id);
         if (!product) {
-            return res.json({
+            return res.status(404).json({
                 error: "Producto no encontrado"
             });
         }
@@ -60,6 +70,22 @@ router.post("/", async (req, res) => {
     const newProduct = req.body;
 
     try {
+        // Verificar si los campos obligatorios están presentes en la solicitud
+        if (!newProduct.title || !newProduct.description || !newProduct.price || !newProduct.code || !newProduct.stock || !newProduct.category || !newProduct.status) {
+            return res.status(400).json({
+                error: "Los campos 'title', 'description', 'price', 'code', 'stock', 'category' y 'status' son obligatorios."
+            });
+        }
+
+        // Verificar si el código del producto ya existe en la base de datos
+        const existingProduct = await productManager.getProductByCode(newProduct.code);
+        if (existingProduct) {
+            return res.status(400).json({
+                error: "El código del producto ya está en uso."
+            });
+        }
+
+        // Si pasa las validaciones, agregar el producto
         await productManager.addProduct(newProduct);
         res.status(201).json({
             message: "Producto agregado exitosamente"
@@ -72,15 +98,21 @@ router.post("/", async (req, res) => {
     }
 });
 
+
 router.put("/:pid", async (req, res) => {
     const id = req.params.pid;
     const productUpdated = req.body;
 
     try {
-        await productManager.updateProduct(id, productUpdated);
-        res.json({
-            message: "Producto actualizado exitosamente"
-        });
+        const updatedProduct = await productManager.updateProduct(id, productUpdated);
+
+        if (!updatedProduct) {
+            res.status(404).send({ message: 'No se puede actualizar un producto que no existe, ingrese un ID válido'})
+        } else {
+            res.json({
+                message: "Producto actualizado exitosamente"
+            });
+        }
     } catch (error) {
         console.error("Error al actualizar producto", error);
         res.status(500).json({
@@ -93,10 +125,15 @@ router.delete("/:pid", async (req, res) => {
     const id = req.params.pid;
 
     try {
-        await productManager.deleteProduct(id);
-        res.json({
-            message: "Producto eliminado exitosamente"
-        });
+        const deletedProduct = await productManager.deleteProduct(id);
+
+        if (!deletedProduct) {
+            return res.status(404).send({ message: 'No se puede eliminar un producto que no existe, ingrese un ID válido' });
+        } else {
+            res.json({
+                message: "Producto eliminado exitosamente"
+            });
+        }
     } catch (error) {
         console.error("Error al eliminar producto", error);
         res.status(500).json({
