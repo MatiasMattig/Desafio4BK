@@ -1,38 +1,24 @@
-//Este archivo define las rutas relacionadas con la gestión de usuarios, incluyendo 
-//la creación de nuevos usuarios y el manejo de fallos en el registro.
-
+// //Este archivo define las rutas relacionadas con la gestión de usuarios, incluyendo 
+// //la creación de nuevos usuarios y el manejo de fallos en el registro.
 
 const express = require("express");
 const router = express.Router();
 const UserModel = require("../dao/models/user.model");
-const { createHash } = require("../utils/hashBcrypt.js");
+const { createHash } = require("../utils/hashBcrypt");
 const passport = require("passport");
 
 // Ruta para crear un nuevo usuario y guardarlo en MongoDB
 router.post("/", passport.authenticate("register", {
-    failureRedirect: "/failedregister"
+    failureRedirect: "/api/users/emailExists" // Redirigir en caso de error
 }), async (req, res) => {
-    if(!req.user) return res.status(400).send({status: "error", message: "Credenciales invalidas"});
+    // Esta función solo se ejecutará si el registro es exitoso
+    res.render("registerSuccess");
+});
 
-    // Si el registro es exitoso, se guarda la información del usuario en la sesión
-    req.session.user = {
-        first_name: req.user.first_name,
-        last_name: req.user.last_name,
-        age: req.user.age,
-        email: req.user.email
-    };
-
-    // Se marca la sesión como iniciada
-    req.session.login = true;
-
-    // Redireccionar al perfil del usuario después del registro
-    res.redirect("/products");
-})
-
-// Ruta para manejar el fallo en el registro
-router.get("/failedregister", (req, res) => {
-    // Respuesta en caso de fallo en el registro
-    res.send({error: "Registro fallido"});
-})
+// Ruta para manejar el caso de correo electrónico ya existente
+router.get("/emailExists", (req, res) => {
+    // Redirigir al usuario a la página de error de correo electrónico existente
+    res.render("emailExists");
+});
 
 module.exports = router;

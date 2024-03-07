@@ -1,5 +1,5 @@
-//Este archivo define las rutas relacionadas con la autenticación de usuarios, incluyendo 
-//el inicio y cierre de sesión, así como el manejo de fallos en el inicio de sesión.
+// //Este archivo define las rutas relacionadas con la autenticación de usuarios, incluyendo 
+// //el inicio y cierre de sesión, así como el manejo de fallos en el inicio de sesión.
 
 const express = require("express");
 const router = express.Router();
@@ -8,30 +8,61 @@ const { isValidPassword } = require("../utils/hashBcrypt.js");
 const passport = require("passport");
 
 // Ruta para el inicio de sesión
-router.post("/login", passport.authenticate("login", {failureRedirect: "/api/sessions/faillogin"}), async (req, res) => {
-    if(!req.user) return res.status(400).send({status: "error", message: "Credenciales invalidas"});
+router.post("/login", async (req, res) => {
+    const { email, password } = req.body;
 
-    // Si el inicio de sesión es exitoso, se guarda la información del usuario en la sesión
-    req.session.user = {
-        first_name: req.user.first_name,
-        last_name: req.user.last_name,
-        age: req.user.age,
-        email: req.user.email
-    };
+    try {
+        // Buscar el usuario por su correo electrónico en la base de datos
+        const user = await UserModel.findOne({ email });
 
-    // Se marca la sesión como iniciada
-    req.session.login = true;
+        // Si el usuario no está registrado, redirigir a la vista de usuario no encontrado
+        if (!user) {
+            return res.redirect("/api/sessions/userNotFound");
+        }
 
-    // Redireccionar al perfil del usuario después del inicio de sesión
-    res.redirect("/products");
-})
+        // Verificar si la contraseña es válida
+        const isValid = await isValidPassword(password, user.password);
 
-// Ruta para manejar el fallo en el inicio de sesión
-router.get("/faillogin", async (req, res ) => {
-    console.log("Error en el inicio de sesion");
-    // Respuesta en caso de fallo en el inicio de sesión
-    res.send({error: "Usuario o contraseña incorrecta"});
-})
+        // Si la contraseña es incorrecta, redirigir a la vista de error de contraseña
+        if (!isValid) {
+            return res.redirect("/api/sessions/passwordError");
+        }
+
+        // Guardar la información del usuario en la sesión
+        req.session.user = {
+            first_name: user.first_name,
+            last_name: user.last_name,
+            age: user.age,
+            email: user.email
+        };
+
+        // Marcar la sesión como iniciada
+        req.session.login = true;
+
+        // Redireccionar al perfil del usuario después del inicio de sesión
+        res.redirect("/products");
+
+    } catch (error) {
+        console.error("Error en el inicio de sesión:", error);
+        // Redirigir a la vista de error general
+        res.redirect("/api/sessions/generalError");
+    }
+});
+
+// Ruta para mostrar mensaje de error de contraseña
+router.get("/passwordError", async (req, res) => {
+    res.render("passwordError");
+});
+
+// Ruta para mostrar mensaje de usuario no encontrado
+router.get("/userNotFound", async (req, res) => {
+    res.render("userNotFound");
+});
+
+// Ruta para mostrar mensaje de error general
+router.get("/generalError", async (req, res) => {
+    res.render("generalError");
+});
 
 // Ruta para cerrar sesión
 router.get("/logout", (req, res) => {
@@ -41,6 +72,6 @@ router.get("/logout", (req, res) => {
     }
     // Redireccionar a la página de inicio de sesión después de cerrar sesión
     res.redirect("/login");
-})
+});
 
 module.exports = router;

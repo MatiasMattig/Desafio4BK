@@ -76,7 +76,7 @@ router.get("/carts/:cid", async (req, res) => {
 
 // Ruta para el formulario de inicio de sesión
 router.get("/login", (req, res) => {
-   // Verifica si el usuario ya está logueado y redirige a la página de perfil si es así
+   // Verifica si el usuario ya está logueado y redirige a la página de productos si es así
    if (req.session.login) {
        return res.redirect("/products");
    }
@@ -87,7 +87,7 @@ router.get("/login", (req, res) => {
 
 // Ruta para el formulario de registro
 router.get("/register", (req, res) => {
-   // Verifica si el usuario ya está logueado y redirige a la página de perfil si es así
+   // Verifica si el usuario ya está logueado y redirige a la página de productos si es así
    if (req.session.login) {
        return res.redirect("/products");
    }

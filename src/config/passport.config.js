@@ -1,7 +1,6 @@
 //Este archivo configura Passport.js para la autenticación de usuarios mediante estrategias locales, 
 //incluyendo el registro y el inicio de sesión, así como la serialización y deserialización de usuarios.
 
-
 const passport = require("passport");
 const local = require("passport-local");
 
@@ -53,7 +52,7 @@ const initializePassport = () => {
                 return done(null, false);
             }
             // Verificamos la contraseña
-            if (!isValidPassword(password, user)) return done(null, false);
+            if (!isValidPassword(password, user.password)) return done(null, false);
             
             // Si la contraseña coincide, pasamos el usuario al callback
             return done(null, user);

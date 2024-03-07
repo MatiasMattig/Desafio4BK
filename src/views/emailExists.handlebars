@@ -1,0 +1,16 @@
+<!-- emailExists.handlebars -->
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    Swal.fire({
+        icon: 'error',
+        title: '¡Correo electrónico ya registrado!',
+        text: 'El correo electrónico ingresado ya está registrado en nuestra base de datos. Por favor, utiliza otro correo electrónico.',
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+        allowOutsideClick: false
+    }).then((result) => {
+        // Redireccionar al usuario a la página de registro
+        window.location.href = '/register';
+    });
+</script>

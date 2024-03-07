@@ -1,0 +1,15 @@
+<!-- userNotFound.handlebars -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    Swal.fire({
+        icon: 'error',
+        title: 'Usuario no registrado',
+        text: 'El usuario que intentas usar no está registrado. Por favor, regístrate primero.',
+        showConfirmButton: true,
+        confirmButtonText: 'OK',
+        allowOutsideClick: false
+    }).then((result) => {
+        // Redireccionar al usuario a la página de inicio de sesión
+        window.location.href = '/login';
+    });
+</script>
