@@ -74,4 +74,15 @@ router.get("/logout", (req, res) => {
     res.redirect("/login");
 });
 
+//Login con Github
+
+router.get("/github", passport.authenticate("github", {scope: ["user:email"]}), async (req, res) => {})
+
+router.get("/githubcallback", passport.authenticate("github", {failureRedirect: "/login"}), async (req, res) => {
+    //La estrategía de github nos retornará el usuario, entonces lo agregamos a nuestro objeto de session. 
+    req.session.user = req.user; 
+    req.session.login = true; 
+    res.redirect("/profile");
+})
+
 module.exports = router;
