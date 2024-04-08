@@ -133,6 +133,22 @@ class ProductManager {
             throw error;
         }
     }
+
+    async getProductByCode(code) {
+        try {
+            const product = await ProductModel.findOne({ code });
+    
+            if (!product) {
+                return null;
+            }
+    
+            return product;
+        } catch (error) {
+            console.log("Error al obtener el producto por código", error);
+            throw error;
+        }
+    }
+    
 }
 
 module.exports = ProductManager; 
