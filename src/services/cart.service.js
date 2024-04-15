@@ -1,5 +1,4 @@
-const CartModel = require("../dao/models/cart.model.js");
-const ProductModel = require("../dao/models/product.model.js");
+const CartModel = require("../dao/models/cart.model");
 
 class CartService {
     async createCart() {
@@ -8,124 +7,105 @@ class CartService {
             await newCart.save();
             return newCart;
         } catch (error) {
-            console.error("Error al crear el nuevo carrito de compras", error);
-            throw error;
+            throw new Error("Error");
         }
     }
 
-    async getCartById(cartId) {
+    async getProductsFromCart(idCart) {
         try {
-            const cart = await CartModel.findById(cartId);
+            const cart = await CartModel.findById(idCart);
             if (!cart) {
-                throw new Error("No existe ese carrito con el ID proporcionado");
+                console.log("No existe ese carrito con el id");
+                return null;
             }
             return cart;
         } catch (error) {
-            console.error("Error al obtener el carrito por ID", error);
-            throw error;
+            throw new Error("Error");
         }
     }
 
-    async addProductToCart(cartId, productId, quantity = 1) {
+    async addProduct(cartId, productId, quantity = 1) {
         try {
-            // Verificar si el producto existe en la base de datos
-            const productExists = await ProductModel.findById(productId);
-            if (!productExists) {
-                throw new Error("El producto que intenta agregar no existe.");
-            }
+            const cart = await this.getProductsFromCart(cartId);
+            const existsProduct = cart.products.find(item => item.product._id.toString() === productId);
 
-            // Obtener el carrito
-            const cart = await this.getCartById(cartId);
-
-            // Verificar si el producto ya está en el carrito
-            const existingProductIndex = cart.products.findIndex(item => item.product.toString() === productId);
-
-            if (existingProductIndex !== -1) {
-                // Si el producto ya está en el carrito, actualizar la cantidad
-                cart.products[existingProductIndex].quantity += quantity;
+            if (existsProduct) {
+                existsProduct.quantity += quantity;
             } else {
-                // Si el producto no está en el carrito, agregarlo
                 cart.products.push({ product: productId, quantity });
             }
 
-            // Marcar la propiedad "products" como modificada antes de guardar
+            //Vamos a marcar la propiedad "products" como modificada antes de guardar: 
             cart.markModified("products");
 
-            // Guardar el carrito actualizado
             await cart.save();
             return cart;
         } catch (error) {
-            console.error("Error al agregar un producto al carrito", error);
-            throw error;
+            throw new Error("Error");
         }
     }
 
-    async removeProductFromCart(cartId, productId) {
+    async removeProduct(cartId, productId) {
         try {
             const cart = await CartModel.findById(cartId);
-    
             if (!cart) {
                 throw new Error('Carrito no encontrado');
             }
-    
             cart.products = cart.products.filter(item => item.product._id.toString() !== productId);
-    
             await cart.save();
-    
             return cart;
         } catch (error) {
-            console.error('Error al eliminar el producto del carrito en el servicio', error);
-            throw error;
+            throw new Error("Error");
         }
     }
-    
-    async updateCart(cartId, updatedProducts) {
+
+    async updateProductsInCart(cartId, updatedProducts) {
         try {
             const cart = await CartModel.findById(cartId);
-    
+
             if (!cart) {
                 throw new Error('Carrito no encontrado');
             }
-    
+
             cart.products = updatedProducts;
-    
+
             cart.markModified('products');
-    
             await cart.save();
-    
             return cart;
         } catch (error) {
-            console.error('Error al actualizar el carrito en el servicio', error);
-            throw error;
+            throw new Error("Error");
         }
     }
-    
-    async updateProductQuantity(cartId, productId, newQuantity) {
+
+    async updateQuantityesInCart(cartId, productId, newQuantity) {
         try {
             const cart = await CartModel.findById(cartId);
-    
+
             if (!cart) {
+                
                 throw new Error('Carrito no encontrado');
             }
-    
-            const productIndex = cart.products.findIndex(item => item.product._id.toString() === productId);
-    
+            
+            
+            const productIndex = cart.products.findIndex(item => item._id.toString() === productId);
+        
             if (productIndex !== -1) {
                 cart.products[productIndex].quantity = newQuantity;
-    
+
+
                 cart.markModified('products');
-    
+
                 await cart.save();
                 return cart;
             } else {
                 throw new Error('Producto no encontrado en el carrito');
             }
+
         } catch (error) {
-            console.error('Error al actualizar la cantidad del producto en el carrito en el servicio', error);
-            throw error;
+            throw new Error("Error al actualizar las cantidades");
         }
     }
-    
+
     async emptyCart(cartId) {
         try {
             const cart = await CartModel.findByIdAndUpdate(
@@ -133,17 +113,17 @@ class CartService {
                 { products: [] },
                 { new: true }
             );
-    
+
             if (!cart) {
                 throw new Error('Carrito no encontrado');
             }
-    
+
             return cart;
+
         } catch (error) {
-            console.error('Error al vaciar el carrito en el servicio', error);
-            throw error;
+            throw new Error("Error");
         }
-    }    
+    }
 }
 
 module.exports = CartService;

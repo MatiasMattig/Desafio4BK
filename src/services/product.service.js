@@ -1,21 +1,21 @@
-const ProductModel = require("../dao/models/product.model.js");
+const ProductModel = require("../dao/models/product.model");
 
 class ProductService {
-    async addProduct(newProduct) {
+    async addProduct({ title, description, price, img, code, stock, category, thumbnails }) {
         try {
-            const { title, description, price, img, code, stock, category, thumbnails } = newProduct;
-
             if (!title || !description || !price || !code || !stock || !category) {
-                throw new Error("Todos los campos son obligatorios");
+                console.log("Todos los campos son obligatorios");
+                return;
             }
 
-            const existsProduct = await ProductModel.findOne({ code });
+            const existsProduct = await ProductModel.findOne({ code: code });
 
             if (existsProduct) {
-                throw new Error("El código debe ser único");
+                console.log("El código debe ser único");
+                return;
             }
 
-            const product = new ProductModel({
+            const newProduct = new ProductModel({
                 title,
                 description,
                 price,
@@ -27,14 +27,16 @@ class ProductService {
                 thumbnails: thumbnails || []
             });
 
-            await product.save();
+            await newProduct.save();
+
+            return newProduct;
+
         } catch (error) {
-            console.error("Error al agregar producto", error);
-            throw error;
+            throw new Error("Error");
         }
     }
 
-    async getProducts({ limit = 10, page = 1, sort, query } = {}) {
+    async getProducts(limit = 10, page = 1, sort, query) {
         try {
             const skip = (page - 1) * limit;
 
@@ -58,10 +60,12 @@ class ProductService {
                 .limit(limit);
 
             const totalProducts = await ProductModel.countDocuments(queryOptions);
-
+            
             const totalPages = Math.ceil(totalProducts / limit);
+            
             const hasPrevPage = page > 1;
             const hasNextPage = page < totalPages;
+            
 
             return {
                 docs: products,
@@ -75,8 +79,7 @@ class ProductService {
                 nextLink: hasNextPage ? `/api/products?limit=${limit}&page=${page + 1}&sort=${sort}&query=${query}` : null,
             };
         } catch (error) {
-            console.error("Error al obtener los productos", error);
-            throw error;
+            throw new Error("Error");
         }
     }
 
@@ -85,58 +88,45 @@ class ProductService {
             const product = await ProductModel.findById(id);
 
             if (!product) {
-                throw new Error("Producto no encontrado");
-            }
-
-            return product;
-        } catch (error) {
-            console.error("Error al obtener producto por ID", error);
-            throw error;
-        }
-    }
-
-    async updateProduct(id, productUpdated) {
-        try {
-            const updatedProduct = await ProductModel.findByIdAndUpdate(id, productUpdated);
-
-            if (!updatedProduct) {
-                throw new Error("No se encuentra el producto");
-            }
-
-            return updatedProduct;
-        } catch (error) {
-            console.error("Error al actualizar producto", error);
-            throw error;
-        }
-    }
-
-    async deleteProduct(id) {
-        try {
-            const deletedProduct = await ProductModel.findByIdAndDelete(id);
-
-            if (!deletedProduct) {
-                throw new Error("No se encuentra el producto");
-            }
-
-            return deletedProduct;
-        } catch (error) {
-            console.error("Error al eliminar producto", error);
-            throw error;
-        }
-    }
-
-    async getProductByCode(code) {
-        try {
-            const product = await ProductModel.findOne({ code });
-
-            if (!product) {
+                console.log("No se encontro ningun producto con este id");
                 return null;
             }
 
+            console.log("Producto encontrado");
             return product;
         } catch (error) {
-            console.error("Error al obtener producto por código", error);
-            throw error;
+            throw new Error("Error");
+        }
+    }
+
+    async UpdateProduct(id, productUpdated) {
+        try {
+            const updated = await ProductModel.findByIdAndUpdate(id, productUpdated);
+            if (!updated) {
+                console.log("No se encontro ningun producto con este id");
+                return null;
+            }
+
+            console.log("Producto actualizado con exito");
+            return updated;
+        } catch (error) {
+            throw new Error("Error");
+        }
+    }
+
+    async removeProduct(id) {
+        try {
+            const deleted = await ProductModel.findByIdAndDelete(id);
+
+            if (!deleted) {
+                console.log("No hay ningun producto con ese id");
+                return null;
+            }
+
+            console.log("Producto eliminado correctamente");
+            return deleted;
+        } catch (error) {
+            throw new Error("Error");
         }
     }
 }

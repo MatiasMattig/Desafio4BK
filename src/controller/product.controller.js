@@ -1,76 +1,68 @@
 const ProductService = require("../services/product.service.js");
+const productService = new ProductService();
 
 class ProductController {
-    constructor() {
-        this.productService = new ProductService();
+
+    async addProduct(req, res) {
+        const newProduct = req.body;
+        try {
+            const product = await productService.addProduct(newProduct);
+            res.json(product);
+
+        } catch (error) {
+            res.status(500).send("Error");
+        }
     }
 
     async getProducts(req, res) {
         try {
-            const { limit = 10, page = 1, sort, query } = req.query;
-            const products = await this.productService.getProducts({ limit, page, sort, query });
+            let { limit = 10, page = 1, sort, query } = req.query;
+
+            const products = await productService.getProducts(limit, page, sort, query);
+           
             res.json(products);
-        } catch (error) {
-            console.error("Error al obtener productos", error);
-            res.status(500).json({ error: "Error interno del servidor" });
+        } catch (error) { 
+            res.status(500).send("Error");
         }
     }
 
     async getProductById(req, res) {
         const id = req.params.pid;
         try {
-            const product = await this.productService.getProductById(id);
+            const product = await productService.getProductById(id);
             if (!product) {
-                return res.status(404).json({ error: "Producto no encontrado" });
+                return res.json({
+                    error: "Producto no encontrado"
+                });
             }
             res.json(product);
         } catch (error) {
-            console.error("Error al obtener producto", error);
-            res.status(500).json({ error: "Error interno del servidor" });
-        }
-    }
-
-    async addProduct(req, res) {
-        const newProduct = req.body;
-        try {
-            await this.productService.addProduct(newProduct);
-            res.status(201).json({ message: "Producto agregado exitosamente" });
-        } catch (error) {
-            console.error("Error al agregar producto", error);
-            res.status(500).json({ error: "Error interno del servidor" });
+            res.status(500).send("Error");
         }
     }
 
     async updateProduct(req, res) {
-        const id = req.params.pid;
-        const productUpdated = req.body;
         try {
-            const updatedProduct = await this.productService.updateProduct(id, productUpdated);
-            if (!updatedProduct) {
-                res.status(404).send({ message: 'No se puede actualizar un producto que no existe, ingrese un ID válido' });
-            } else {
-                res.json({ message: "Producto actualizado exitosamente" });
-            }
+            const id = req.params.pid;
+            const productUpdated = req.body;
+
+            const product = await productService.UpdateProduct(id, productUpdated);
+            res.json(product);
         } catch (error) {
-            console.error("Error al actualizar producto", error);
-            res.status(500).json({ error: "Error interno del servidor" });
+            res.status(500).send("Error al actualizar el producto");
         }
     }
 
     async deleteProduct(req, res) {
         const id = req.params.pid;
         try {
-            const deletedProduct = await this.productService.deleteProduct(id);
-            if (!deletedProduct) {
-                return res.status(404).send({ message: 'No se puede eliminar un producto que no existe, ingrese un ID válido' });
-            } else {
-                res.json({ message: "Producto eliminado exitosamente" });
-            }
+            let answer = await productService.removeProduct(id);
+
+            res.json(answer);
         } catch (error) {
-            console.error("Error al eliminar producto", error);
-            res.status(500).json({ error: "Error interno del servidor" });
+            res.status(500).send("Error al eliminar el producto");
         }
     }
 }
 
-module.exports = ProductController;
+module.exports = ProductController; 
