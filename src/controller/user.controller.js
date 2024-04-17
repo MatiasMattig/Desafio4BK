@@ -3,6 +3,7 @@ const CartModel = require("../dao/models/cart.model.js");
 const jwt = require("jsonwebtoken");
 const { createHash, isValidPassword } = require("../utils/hashBcrypt.js");
 const UserDTO = require("../dto/user.dto.js");
+const path = require('path');
 
 class UserController {
     async register(req, res) {
@@ -10,7 +11,7 @@ class UserController {
         try {
             const userExists = await UserModel.findOne({ email });
             if (userExists) {
-                return res.status(400).send("El usuario ya existe");
+                return res.render(path.join(__dirname, "../views/emailExists.handlebars"));
             }
 
             //Creo un nuevo carrito: 
@@ -49,13 +50,8 @@ class UserController {
         try {
             const userFound = await UserModel.findOne({ email });
 
-            if (!userFound) {
-                return res.status(401).send("Usuario no válido");
-            }
-
-            const isValid = isValidPassword(password, userFound);
-            if (!isValid) {
-                return res.status(401).send("Contraseña incorrecta");
+            if (!userFound || !isValidPassword(password, userFound)) {
+                return res.render(path.join(__dirname, "../views/passwordError.handlebars"));
             }
 
             const token = jwt.sign({ user: userFound }, "coderhouse", {
