@@ -1,6 +1,6 @@
 const socket = require("socket.io");
-const ProductRepository = require("../services/product.service.js");
-const productRepository = new ProductRepository(); 
+const ProductService = require("../services/product.service.js");
+const productService = new ProductService(); 
 const MessageModel = require("../dao/models/message.model.js");
 
 class SocketManager {
@@ -13,15 +13,15 @@ class SocketManager {
         this.io.on("connection", async (socket) => {
             console.log("Un cliente se conectó");
             
-            socket.emit("products", await productRepository.getProducts() );
+            socket.emit("products", await productService.getProducts() );
 
             socket.on("removeProduct", async (id) => {
-                await productRepository.removeProduct(id);
+                await productService.removeProduct(id);
                 this.emitUpdatedProducts(socket);
             });
 
             socket.on("addProduct", async (product) => {
-                await productRepository.addProduct(product);
+                await productService.addProduct(product);
                 this.emitUpdatedProducts(socket);
             });
 
@@ -34,7 +34,7 @@ class SocketManager {
     }
 
     async emitUpdatedProducts(socket) {
-        socket.emit("products", await productRepository.getProducts());
+        socket.emit("products", await productService.getProducts());
     }
 }
 

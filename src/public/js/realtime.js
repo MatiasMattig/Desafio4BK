@@ -19,6 +19,7 @@ const renderProducts = (products) => {
                         <p> ${item.title} </p>
                         <p> ${item.price} </p>
                         <button> Eliminar </button>
+                        <button> Actualizar </button>
                         `;
 
         productContainer.appendChild(card);
