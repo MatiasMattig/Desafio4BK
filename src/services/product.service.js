@@ -99,20 +99,22 @@ class ProductService {
         }
     }
 
-    async UpdateProduct(id, productUpdated) {
+    async updateProduct(id, updatedFields) {
         try {
-            const updated = await ProductModel.findByIdAndUpdate(id, productUpdated);
-            if (!updated) {
-                console.log("No se encontro ningun producto con este id");
+            const updatedProduct = await ProductModel.findByIdAndUpdate(id, updatedFields, { new: true });
+    
+            if (!updatedProduct) {
+                console.log("No se encontró ningún producto con este id");
                 return null;
             }
-
-            console.log("Producto actualizado con exito");
-            return updated;
+    
+            console.log("Producto actualizado con éxito");
+            return updatedProduct;
         } catch (error) {
-            throw new Error("Error");
+            throw new Error("Error al actualizar el producto");
         }
     }
+    
 
     async removeProduct(id) {
         try {

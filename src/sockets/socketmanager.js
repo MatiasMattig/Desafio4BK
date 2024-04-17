@@ -30,6 +30,11 @@ class SocketManager {
                 const messages = await MessageModel.find();
                 socket.emit("message", messages);
             });
+            socket.on("updateProduct", async (data) => {
+                const { id, updatedFields } = data;
+                await productService.updateProduct(id, updatedFields);
+                this.emitUpdatedProducts(socket);
+            });            
         });
     }
 

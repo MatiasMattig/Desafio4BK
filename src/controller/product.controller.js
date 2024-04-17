@@ -46,7 +46,7 @@ class ProductController {
             const id = req.params.pid;
             const productUpdated = req.body;
 
-            const product = await productService.UpdateProduct(id, productUpdated);
+            const product = await productService.updateProduct(id, productUpdated);
             res.json(product);
         } catch (error) {
             res.status(500).send("Error al actualizar el producto");
