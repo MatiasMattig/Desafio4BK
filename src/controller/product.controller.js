@@ -8,21 +8,20 @@ class ProductController {
         try {
             const product = await productService.addProduct(newProduct);
             res.json(product);
-
         } catch (error) {
-            res.status(500).send("Error");
+            console.error("Error al agregar un producto:", error);
+            res.status(500).send("Hubo un problema al agregar el producto. Por favor, inténtalo de nuevo más tarde.");
         }
     }
 
     async getProducts(req, res) {
         try {
             let { limit = 10, page = 1, sort, query } = req.query;
-
             const products = await productService.getProducts(limit, page, sort, query);
-           
             res.json(products);
         } catch (error) { 
-            res.status(500).send("Error");
+            console.error("Error al obtener productos:", error);
+            res.status(500).send("Hubo un problema al obtener los productos. Por favor, inténtalo de nuevo más tarde.");
         }
     }
 
@@ -37,7 +36,8 @@ class ProductController {
             }
             res.json(product);
         } catch (error) {
-            res.status(500).send("Error");
+            console.error("Error al obtener un producto por ID:", error);
+            res.status(500).send("Hubo un problema al obtener el producto. Por favor, inténtalo de nuevo más tarde.");
         }
     }
 
@@ -45,11 +45,11 @@ class ProductController {
         try {
             const id = req.params.pid;
             const productUpdated = req.body;
-
             const product = await productService.updateProduct(id, productUpdated);
             res.json(product);
         } catch (error) {
-            res.status(500).send("Error al actualizar el producto");
+            console.error("Error al actualizar un producto:", error);
+            res.status(500).send("Hubo un problema al actualizar el producto. Por favor, inténtalo de nuevo más tarde.");
         }
     }
 
@@ -57,12 +57,12 @@ class ProductController {
         const id = req.params.pid;
         try {
             let answer = await productService.removeProduct(id);
-
             res.json(answer);
         } catch (error) {
-            res.status(500).send("Error al eliminar el producto");
+            console.error("Error al eliminar un producto:", error);
+            res.status(500).send("Hubo un problema al eliminar el producto. Por favor, inténtalo de nuevo más tarde.");
         }
     }
 }
 
-module.exports = ProductController; 
+module.exports = ProductController;

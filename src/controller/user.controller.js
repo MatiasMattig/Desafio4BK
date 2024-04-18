@@ -14,7 +14,6 @@ class UserController {
                 return res.render(path.join(__dirname, "../views/emailExists.handlebars"));
             }
 
-            //Creo un nuevo carrito: 
             const newCart = new CartModel();
             await newCart.save();
 
@@ -40,8 +39,8 @@ class UserController {
 
             res.redirect("/api/users/profile");
         } catch (error) {
-            console.error(error);
-            res.status(500).send("Error interno del servidor");
+            console.error("Error al registrar usuario:", error);
+            res.status(500).send("Hubo un problema al registrar el usuario. Por favor, inténtalo de nuevo más tarde.");
         }
     }
 
@@ -65,13 +64,12 @@ class UserController {
 
             res.redirect("/api/users/profile");
         } catch (error) {
-            console.error(error);
-            res.status(500).send("Error interno del servidor");
+            console.error("Error al iniciar sesión:", error);
+            res.status(500).send("Hubo un problema al iniciar sesión. Por favor, inténtalo de nuevo más tarde.");
         }
     }
 
     async profile(req, res) {
-        //Con DTO: 
         const userDto = new UserDTO(req.user.first_name, req.user.last_name, req.user.role);
         const isAdmin = req.user.role === 'admin';
         res.render("profile", { user: userDto, isAdmin });

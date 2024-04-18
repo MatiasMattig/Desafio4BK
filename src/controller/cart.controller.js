@@ -12,7 +12,8 @@ class CartController {
             const newCart = await cartService.createCart();
             res.json(newCart);
         } catch (error) {
-            res.status(500).send("Error");
+            console.error("Error al crear un nuevo carrito:", error);
+            res.status(500).send("Hubo un problema al crear un nuevo carrito. Por favor, inténtalo de nuevo más tarde.");
         }
     }
 
@@ -25,7 +26,8 @@ class CartController {
             }
             res.json(products);
         } catch (error) {
-            res.status(500).send("Error");
+            console.error("Error al obtener productos del carrito:", error);
+            res.status(500).send("Hubo un problema al obtener productos del carrito. Por favor, inténtalo de nuevo más tarde.");
         }
     }
 
@@ -35,8 +37,10 @@ class CartController {
         const quantity = req.body.quantity || 1;
         try {
             await cartService.addProduct(cartId, productId, quantity);
+            res.status(200).send("Producto agregado al carrito correctamente");
         } catch (error) {
-            res.status(500).send("Error");
+            console.error("Error al agregar producto al carrito:", error);
+            res.status(500).send("Hubo un problema al agregar producto al carrito. Por favor, inténtalo de nuevo más tarde.");
         }
     }
 
@@ -51,19 +55,20 @@ class CartController {
                 updatedCart,
             });
         } catch (error) {
-            res.status(500).send("Error");
+            console.error("Error al eliminar producto del carrito:", error);
+            res.status(500).send("Hubo un problema al eliminar producto del carrito. Por favor, inténtalo de nuevo más tarde.");
         }
     }
 
     async updateProductsInCart(req, res) {
         const cartId = req.params.cid;
         const updatedProducts = req.body;
-        // Debes enviar un arreglo de productos en el cuerpo de la solicitud
         try {
             const updatedCart = await cartService.updateProductsInCart(cartId, updatedProducts);
             res.json(updatedCart);
         } catch (error) {
-            res.status(500).send("Error");
+            console.error("Error al actualizar productos en el carrito:", error);
+            res.status(500).send("Hubo un problema al actualizar productos en el carrito. Por favor, inténtalo de nuevo más tarde.");
         }
     }
 
@@ -73,15 +78,14 @@ class CartController {
         const newQuantity = req.body.quantity;
         try {
             const updatedCart = await cartService.updateQuantityesInCart(cartId, productId, newQuantity);
-
             res.json({
                 status: 'success',
                 message: 'Cantidad del producto actualizada correctamente',
                 updatedCart,
             });
-
         } catch (error) {
-            res.status(500).send("Error al actualizar la cantidad de productos");
+            console.error("Error al actualizar cantidad de productos en el carrito:", error);
+            res.status(500).send("Hubo un problema al actualizar cantidad de productos en el carrito. Por favor, inténtalo de nuevo más tarde.");
         }
     }
 
@@ -89,46 +93,36 @@ class CartController {
         const cartId = req.params.cid;
         try {
             const updatedCart = await cartService.emptyCart(cartId);
-
             res.json({
                 status: 'success',
                 message: 'Todos los productos del carrito fueron eliminados correctamente',
                 updatedCart,
             });
-
         } catch (error) {
-            res.status(500).send("Error");
+            console.error("Error al vaciar el carrito:", error);
+            res.status(500).send("Hubo un problema al vaciar el carrito. Por favor, inténtalo de nuevo más tarde.");
         }
     }
 
-    //Ultima Pre Entrega: 
     async finishPurchase(req, res) {
         const cartId = req.params.cid;
         try {
-            // Obtener el carrito y sus productos
             const cart = await cartService.getProductsFromCart(cartId);
             const products = cart.products;
-
-            // Inicializar un arreglo para almacenar los productos no disponibles
             const productsNotAvailable = [];
 
-            // Verificar el stock y actualizar los productos disponibles
             for (const item of products) {
                 const productId = item.product;
                 const product = await productService.getProductById(productId);
                 if (product.stock >= item.quantity) {
-                    // Si hay suficiente stock, restar la cantidad del producto
                     product.stock -= item.quantity;
                     await product.save();
                 } else {
-                    // Si no hay suficiente stock, agregar el ID del producto al arreglo de no disponibles
                     productsNotAvailable.push(productId);
                 }
             }
 
             const userWithCart = await UserModel.findOne({ cart: cartId });
-
-            // Crear un ticket con los datos de la compra
             const ticket = new TicketModel({
                 code: generateUniqueCode(),
                 purchase_datetime: new Date(),
@@ -137,16 +131,13 @@ class CartController {
             });
             await ticket.save();
 
-            // Eliminar del carrito los productos que sí se compraron
             cart.products = cart.products.filter(item => productsNotAvailable.some(productId => productId.equals(item.product)));
-
-            // Guardar el carrito actualizado en la base de datos
             await cart.save();
 
             res.status(200).json({ productsNotAvailable });
         } catch (error) {
             console.error('Error al procesar la compra:', error);
-            res.status(500).json({ error: 'Error interno del servidor' });
+            res.status(500).json({ error: 'Hubo un problema al procesar la compra. Por favor, inténtalo de nuevo más tarde.' });
         }
     }
 

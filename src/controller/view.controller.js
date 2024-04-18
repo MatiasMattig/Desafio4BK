@@ -21,15 +21,12 @@ class ViewsController {
             const hasPrevPage = page > 1;
             const hasNextPage = page < totalPages;
 
-
             const newArray = products.map(product => {
                 const { _id, ...rest } = product.toObject();
-                return { id: _id, ...rest }; // Agregar el ID al objeto
+                return { id: _id, ...rest };
             });
 
-
             const cartId = req.user.cart.toString();
-            //console.log(cartId);
 
             res.render("products", {
                 products: newArray,
@@ -43,10 +40,10 @@ class ViewsController {
             });
 
         } catch (error) {
-            console.error("Error al obtener productos", error);
+            console.error("Error al obtener productos:", error);
             res.status(500).json({
                 status: 'error',
-                error: "Error interno del servidor"
+                message: "Hubo un problema al obtener los productos. Por favor, inténtalo de nuevo más tarde."
             });
         }
     }
@@ -57,10 +54,9 @@ class ViewsController {
             const cart = await cartService.getProductsFromCart(cartId);
 
             if (!cart) {
-                console.log("No existe un carrito con ese id");
-                return res.status(404).json({ error: "Carrito no encontrado" });
+                console.log("No se encontró el carrito con el ID proporcionado");
+                return res.status(404).json({ error: "No se encontró el carrito solicitado." });
             }
-
 
             let totalPurchase = 0;
 
@@ -69,7 +65,6 @@ class ViewsController {
                 const quantity = item.quantity;
                 const totalPrice = product.price * quantity;
 
-                
                 totalPurchase += totalPrice;
 
                 return {
@@ -81,8 +76,8 @@ class ViewsController {
 
             res.render("carts", { products: productsInCart, totalPurchase, cartId });
         } catch (error) {
-            console.error("Error al obtener el carrito", error);
-            res.status(500).json({ error: "Error interno del servidor" });
+            console.error("Error al obtener el carrito:", error);
+            res.status(500).json({ error: "Hubo un problema al obtener el carrito. Por favor, inténtalo de nuevo más tarde." });
         }
     }
 
@@ -98,8 +93,8 @@ class ViewsController {
         try {
             res.render("realtimeproducts");
         } catch (error) {
-            console.log("Error en la vista real time", error);
-            res.status(500).json({ error: "Error interno del servidor" });
+            console.log("Error al renderizar la vista de productos en tiempo real:", error);
+            res.status(500).json({ error: "Hubo un problema al cargar la vista de productos en tiempo real. Por favor, inténtalo de nuevo más tarde." });
         }
     }
 
