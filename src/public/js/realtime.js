@@ -53,6 +53,8 @@ const addProduct = () => {
     socket.emit("addProduct", product);
 };
 
+document.getElementById("btnEnviar").addEventListener("click", addProduct);
+
 function openUpdateForm(product) {
     const updateForm = document.createElement("form");
 
