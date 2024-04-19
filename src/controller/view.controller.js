@@ -21,12 +21,15 @@ class ViewsController {
             const hasPrevPage = page > 1;
             const hasNextPage = page < totalPages;
 
+
             const newArray = products.map(product => {
                 const { _id, ...rest } = product.toObject();
-                return { id: _id, ...rest };
+                return { id: _id, ...rest }; // Agregar el ID al objeto
             });
 
+
             const cartId = req.user.cart.toString();
+            //console.log(cartId);
 
             res.render("products", {
                 products: newArray,
@@ -40,7 +43,7 @@ class ViewsController {
             });
 
         } catch (error) {
-            console.error("Error al obtener productos:", error);
+            console.error("Error al obtener productos", error);
             res.status(500).json({
                 status: 'error',
                 message: "Hubo un problema al obtener los productos. Por favor, inténtalo de nuevo más tarde."
@@ -58,13 +61,15 @@ class ViewsController {
                 return res.status(404).json({ error: "No se encontró el carrito solicitado." });
             }
 
+
             let totalPurchase = 0;
 
             const productsInCart = cart.products.map(item => {
-                const product = item.product.toObject();
+                const product = item.product ? item.product.toObject() : null;
                 const quantity = item.quantity;
-                const totalPrice = product.price * quantity;
+                const totalPrice = item.product ? item.product.price * quantity : 0;
 
+                
                 totalPurchase += totalPrice;
 
                 return {
