@@ -13,6 +13,7 @@ const productsRouter = require("./routes/products.router.js");
 const cartsRouter = require("./routes/carts.router.js");
 const viewsRouter = require("./routes/views.router.js");
 const userRouter = require("./routes/user.router.js");
+const mockingProductsRouter = require("./routes/mockingProducts.router.js");
 
 //Middleware
 app.use(express.urlencoded({ extended: true }));
@@ -41,6 +42,7 @@ app.use("/api/products", productsRouter);
 app.use("/api/carts", cartsRouter);
 app.use("/api/users", userRouter);
 app.use("/", viewsRouter);
+app.use("/mockingproducts", mockingProductsRouter);
 
 const httpServer = app.listen(PUERTO, () => {
     console.log(`Servidor escuchando en el puerto ${PUERTO}`);
