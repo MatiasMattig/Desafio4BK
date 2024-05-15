@@ -39,15 +39,12 @@ app.engine("handlebars", exphbs.engine());
 app.set("view engine", "handlebars");
 app.set("views", "./src/views");
 
-
 //Rutas: 
 app.use("/api/products", productsRouter);
 app.use("/api/carts", cartsRouter);
 app.use("/api/users", userRouter);
 app.use("/", viewsRouter);
 app.use("/mockingproducts", mockingProductsRouter);
-
-//Ruta para probar todoooo: 
 
 app.get("/loggertest", (req, res) => {
     req.logger.error("Error fatal");

@@ -1,5 +1,4 @@
 const ProductService = require("../services/product.service.js");
-const CustomError = require("../errors/customError.js");
 const { EErrors } = require("../errors/enums.js");
 const productService = new ProductService();
 
@@ -12,11 +11,6 @@ class ProductController {
             res.json(product);
         } catch (error) {
             req.logger.error("Error al agregar un producto:", error);
-            CustomError.createError({
-                name: "Error al agregar un producto",
-                cause: error.message,
-                code: EErrors.ADD_PRODUCT_ERROR
-            });
         }
     }
 
@@ -27,11 +21,6 @@ class ProductController {
             res.json(products);
         } catch (error) { 
             req.logger.error("Error al obtener productos:", error);
-            CustomError.createError({
-                name: "Error al obtener productos",
-                cause: error.message,
-                code: EErrors.GET_PRODUCTS_ERROR
-            });
         }
     }
 
@@ -47,11 +36,6 @@ class ProductController {
             res.json(product);
         } catch (error) {
             req.logger.error("Error al obtener un producto por ID:", error);
-            CustomError.createError({
-                name: "Error al obtener un producto por ID",
-                cause: error.message,
-                code: EErrors.PRODUCT_NOT_FOUND
-            });
         }
     }
 
@@ -63,11 +47,6 @@ class ProductController {
             res.json(product);
         } catch (error) {
             req.logger.error("Error al actualizar un producto:", error);
-            CustomError.createError({
-                name: "Error al actualizar un producto",
-                cause: error.message,
-                code: EErrors.UPDATE_PRODUCT_ERROR
-            });
         }
     }
 
@@ -78,11 +57,6 @@ class ProductController {
             res.json(answer);
         } catch (error) {
             req.logger.error("Error al eliminar un producto:", error);
-            CustomError.createError({
-                name: "Error al eliminar un producto",
-                cause: error.message,
-                code: EErrors.DELETE_PRODUCT_ERROR
-            });
         }
     }
 }

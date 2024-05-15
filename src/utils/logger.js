@@ -3,8 +3,8 @@ const configObject = require("../config/config.js");
 
 const {mongo_url} = configObject;
 
-const niveles = {
-    nivel: {
+const levels = {
+    level: {
         fatal: 0,
         error: 1,
         warning: 2,
@@ -12,7 +12,7 @@ const niveles = {
         http: 4,
         debug: 5
     },
-    colores: {
+    colors: {
         fatal: "red",
         error: "yellow",
         warning: "blue",
@@ -24,8 +24,8 @@ const niveles = {
 
 //Logger para desarrollo: 
 
-const loggerDesarrollo = winston.createLogger({
-    levels: niveles.nivel,
+const loggerDevelopment = winston.createLogger({
+    levels: levels.level,
     transports: [
         new winston.transports.Console({
             level: "debug"
@@ -36,8 +36,8 @@ const loggerDesarrollo = winston.createLogger({
 
 //Logger para producción: 
 
-const loggerProduccion = winston.createLogger({
-    levels: niveles.nivel,
+const loggerProduction = winston.createLogger({
+    levels: levels.level,
     transports: [
         new winston.transports.File({
             filename: "./errors.log",
@@ -46,7 +46,7 @@ const loggerProduccion = winston.createLogger({
     ]
 })
 
-const logger = mongo_url === "production" ? loggerProduccion : loggerDesarrollo;
+const logger = mongo_url === "production" ? loggerProduction : loggerDevelopment;
 
 const addLogger = (req, res, next) => {
     req.logger = logger;

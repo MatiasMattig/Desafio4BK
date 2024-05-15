@@ -4,7 +4,6 @@ const jwt = require("jsonwebtoken");
 const { createHash, isValidPassword } = require("../utils/hashBcrypt.js");
 const UserDTO = require("../dto/user.dto.js");
 const path = require('path');
-const CustomError = require("../errors/customError.js");
 const { EErrors } = require("../errors/enums.js");
 
 class UserController {
@@ -42,7 +41,7 @@ class UserController {
             res.redirect("/api/users/profile");
         } catch (error) {
             req.logger.error("Error al registrar usuario:", error);
-            throw new CustomError.createError({ code: EErrors.INTERNAL_SERVER_ERROR, message: "Error al registrar usuario" });
+            throw new Error("Error al registrar usuario");
         }
     }
 
@@ -67,7 +66,7 @@ class UserController {
             res.redirect("/api/users/profile");
         } catch (error) {
             req.logger.error("Error al iniciar sesión:", error);
-            throw new CustomError.createError({ code: EErrors.INTERNAL_SERVER_ERROR, message: "Error al iniciar sesión" });
+            throw new Error("Error al iniciar sesión");
         }
     }
 

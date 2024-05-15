@@ -5,7 +5,6 @@ const cartService = new CartService();
 const ProductService = require("../services/product.service.js");
 const productService = new ProductService();
 const { generateUniqueCode, calculateTotal } = require("../utils/cartutils.js");
-const CustomError = require("../errors/customError.js");
 const { EErrors } = require("../errors/enums.js");
 
 class CartController {
@@ -15,11 +14,6 @@ class CartController {
             res.json(newCart);
         } catch (error) {
             req.logger.error("Error al crear un nuevo carrito:", error);
-            CustomError.createError({
-                name: "Error al crear un nuevo carrito",
-                cause: error.message,
-                code: EErrors.INTERNAL_SERVER_ERROR
-            });
         }
     }
 
@@ -33,11 +27,6 @@ class CartController {
             res.json(products);
         } catch (error) {
             req.logger.error("Error al obtener productos del carrito:", error);
-            CustomError.createError({
-                name: "Error al obtener productos del carrito",
-                cause: error.message,
-                code: EErrors.INTERNAL_SERVER_ERROR
-            });
         }
     }
 
@@ -50,11 +39,6 @@ class CartController {
             res.status(200).send("Producto agregado al carrito correctamente");
         } catch (error) {
             req.logger.error("Error al agregar producto al carrito:", error);
-            CustomError.createError({
-                name: "Error al agregar producto al carrito",
-                cause: error.message,
-                code: EErrors.ADD_TO_CART_ERROR
-            });
         }
     }
 
@@ -70,11 +54,6 @@ class CartController {
             });
         } catch (error) {
             req.logger.error("Error al eliminar producto del carrito:", error);
-            CustomError.createError({
-                name: "Error al eliminar producto del carrito",
-                cause: error.message,
-                code: EErrors.REMOVE_FROM_CART_ERROR
-            });
         }
     }
 
@@ -86,11 +65,6 @@ class CartController {
             res.json(updatedCart);
         } catch (error) {
             req.logger.error("Error al actualizar productos en el carrito:", error);
-            CustomError.createError({
-                name: "Error al actualizar productos en el carrito",
-                cause: error.message,
-                code: EErrors.UPDATE_PRODUCTS_ERROR
-            });
         }
     }
 
@@ -107,11 +81,6 @@ class CartController {
             });
         } catch (error) {
             req.logger.error("Error al actualizar cantidad de productos en el carrito:", error);
-            CustomError.createError({
-                name: "Error al actualizar cantidad de productos en el carrito",
-                cause: error.message,
-                code: EErrors.UPDATE_QUANTITY_ERROR
-            });
         }
     }
 
@@ -126,11 +95,6 @@ class CartController {
             });
         } catch (error) {
             req.logger.error("Error al vaciar el carrito:", error);
-            CustomError.createError({
-                name: "Error al vaciar el carrito",
-                cause: error.message,
-                code: EErrors.EMPTY_CART_ERROR
-            });
         }
     }
 
@@ -167,11 +131,6 @@ class CartController {
             res.status(200).json({ productsNotAvailable });
         } catch (error) {
             req.logger.error('Error al procesar la compra:', error);
-            CustomError.createError({
-                name: "Error al procesar la compra",
-                cause: error.message,
-                code: EErrors.PURCHASE_ERROR
-            });
         }
     }
 

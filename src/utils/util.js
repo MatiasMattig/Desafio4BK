@@ -1,6 +1,6 @@
 const {faker} = require("@faker-js/faker"); 
 
-const generarProductos = () => {
+const generateProducts = () => {
     return {
         id: faker.database.mongodbObjectId(),
         title: faker.commerce.productName(),
@@ -12,4 +12,4 @@ const generarProductos = () => {
     }
 }
 
-module.exports = generarProductos;
+module.exports = generateProducts;
