@@ -5,7 +5,8 @@ const cartService = new CartService();
 const ProductService = require("../services/product.service.js");
 const productService = new ProductService();
 const { generateUniqueCode, calculateTotal } = require("../utils/cartutils.js");
-const { EErrors } = require("../errors/enums.js");
+const EmailManager = require("../public/js/email.js");
+const emailManager = new EmailManager();
 
 class CartController {
     async newCart(req, res) {
@@ -117,6 +118,7 @@ class CartController {
             }
 
             const userWithCart = await UserModel.findOne({ cart: cartId });
+            
             const ticket = new TicketModel({
                 code: generateUniqueCode(),
                 purchase_datetime: new Date(),
@@ -128,7 +130,13 @@ class CartController {
             cart.products = cart.products.filter(item => productsNotAvailable.some(productId => productId.equals(item.product)));
             await cart.save();
 
-            res.status(200).json({ productsNotAvailable });
+            await emailManager.sendPurchaseEmail(userWithCart.email, userWithCart.first_name, ticket._id);
+
+            res.render("checkout", {
+                cliente: userWithCart.first_name,
+                email: userWithCart.email,
+                numTicket: ticket._id 
+        });
         } catch (error) {
             req.logger.error('Error al procesar la compra:', error);
         }

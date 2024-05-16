@@ -1,7 +1,6 @@
 const ProductModel = require("../dao/models/product.model.js");
 const CartService = require("../services/cart.service.js");
 const cartService = new CartService();
-const { EErrors } = require("../errors/enums.js");
 
 class ViewsController {
     async renderProducts(req, res) {
@@ -87,8 +86,9 @@ class ViewsController {
     }
 
     async renderRealTimeProducts(req, res) {
+        const user = req.user;
         try {
-            res.render("realtimeproducts");
+            res.render("realtimeproducts", {role: user.role, email: user.email});
         } catch (error) {
             req.logger.error("Error al renderizar la vista de productos en tiempo real:", error);
             throw new Error("Error al renderizar la vista de productos en tiempo real");
@@ -101,6 +101,22 @@ class ViewsController {
 
     async renderHome(req, res) {
         res.render("home");
+    }
+
+    async renderResetPassword(req, res) {
+        res.render("passwordreset");
+    }
+
+    async renderCambioPassword(req, res) {
+        res.render("passwordcambio");
+    }
+
+    async renderConfirmacion(req, res) {
+        res.render("confirmacion-envio");
+    }
+
+    async renderPremium(req, res) {
+        res.render("panel-premium");
     }
 }
 

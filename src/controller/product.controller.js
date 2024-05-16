@@ -1,5 +1,4 @@
 const ProductService = require("../services/product.service.js");
-const { EErrors } = require("../errors/enums.js");
 const productService = new ProductService();
 
 class ProductController {
@@ -52,8 +51,9 @@ class ProductController {
 
     async deleteProduct(req, res) {
         const id = req.params.pid;
+        const user = req.user;
         try {
-            let answer = await productService.removeProduct(id);
+            let answer = await productService.removeProduct(id, user);
             res.json(answer);
         } catch (error) {
             req.logger.error("Error al eliminar un producto:", error);

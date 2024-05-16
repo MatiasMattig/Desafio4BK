@@ -1,4 +1,9 @@
 const socket = io();
+const role = document.getElementById("role").textContent;
+const email = document.getElementById("email").textContent;
+
+console.log('User role:', role);
+console.log('User email:', email);
 
 socket.on("products", (data) => {
     renderProducts(data);
@@ -16,20 +21,48 @@ const renderProducts = (products) => {
         card.innerHTML = `
             <p> ${item.title} </p>
             <p> ${item.price} </p>
-            <button class="btn-remove">Eliminar</button>
+            <button class="btn-remove" >Eliminar</button> 
             <button class="btn-update" data-id="${item._id}">Actualizar</button>
         `;
 
         productContainer.appendChild(card);
 
+        // card.querySelector(".btn-remove").addEventListener("click", () => {
+        //     removeProduct(item._id);
+        // });
+
         card.querySelector(".btn-remove").addEventListener("click", () => {
-            removeProduct(item._id);
+            if (role === "premium" && item.owner === email) {
+                removeProduct(item._id);
+            } else if (role === "admin") {
+                removeProduct(item._id);
+            } else {
+                Swal.fire({
+                    title: "Error",
+                    text: "No tenes permiso para borrar ese producto",
+                })
+            }
         });
+
+        // card.querySelector(".btn-update").addEventListener("click", () => {
+        //     const productId = card.querySelector(".btn-update").dataset.id;
+        //     const productToUpdate = products.docs.find(product => product._id === productId);
+        //     openUpdateForm(productToUpdate);
+        // });
 
         card.querySelector(".btn-update").addEventListener("click", () => {
             const productId = card.querySelector(".btn-update").dataset.id;
             const productToUpdate = products.docs.find(product => product._id === productId);
-            openUpdateForm(productToUpdate);
+            if (role === "premium" && item.owner === email) {
+                openUpdateForm(productToUpdate);
+            } else if (role === "admin") {
+                openUpdateForm(productToUpdate);
+            } else {
+                Swal.fire({
+                    title: "Error",
+                    text: "No tenes permiso para actualizar ese producto",
+                })
+            }
         });
     });
 };
@@ -39,6 +72,9 @@ const removeProduct = (id) => {
 };
 
 const addProduct = () => {
+
+    const owner = role === "premium" ? email : "admin";
+
     const product = {
         title: document.getElementById("title").value,
         description: document.getElementById("description").value,
@@ -48,6 +84,7 @@ const addProduct = () => {
         stock: document.getElementById("stock").value,
         category: document.getElementById("category").value,
         status: document.getElementById("status").value === "true",
+        owner
     };
 
     socket.emit("addProduct", product);

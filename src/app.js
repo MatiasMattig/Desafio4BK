@@ -46,14 +46,14 @@ app.use("/api/users", userRouter);
 app.use("/", viewsRouter);
 app.use("/mockingproducts", mockingProductsRouter);
 
-app.get("/loggertest", (req, res) => {
-    req.logger.error("Error fatal");
-    req.logger.debug("Mensaje de debug");
-    req.logger.info("Mensaje de Info");
-    req.logger.warning("Mensaje de Warning");
-    console.log(configObject.mongo_url);
-    res.send("Test de logs");
-})
+// app.get("/loggertest", (req, res) => {
+//     req.logger.error("Error fatal");
+//     req.logger.debug("Mensaje de debug");
+//     req.logger.info("Mensaje de Info");
+//     req.logger.warning("Mensaje de Warning");
+//     console.log(configObject.mongo_url);
+//     res.send("Test de logs");
+// })
 
 const httpServer = app.listen(PUERTO, () => {
     console.log(`Servidor escuchando en el puerto ${PUERTO}`);

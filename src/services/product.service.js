@@ -3,7 +3,7 @@ const CustomError = require("../errors/customError.js");
 const ProductModel = require("../dao/models/product.model");
 
 class ProductService {
-    async addProduct({ title, description, price, img, code, stock, category, thumbnails }) {
+    async addProduct({ title, description, price, img, code, stock, category, thumbnails, owner }) {
         try {
             if (!title || !description || !price || !code || !stock || !category) {
                 CustomError.createError({ code: EErrors.INVALID_TYPE_ERROR, message: "Todos los campos son obligatorios" });
@@ -15,6 +15,8 @@ class ProductService {
                 CustomError.createError({ code: EErrors.INVALID_TYPE_ERROR, message: "El código debe ser único" });
             }
 
+            console.log("Owner", owner);
+
             const newProduct = new ProductModel({
                 title,
                 description,
@@ -24,7 +26,8 @@ class ProductService {
                 stock,
                 category,
                 status: true,
-                thumbnails: thumbnails || []
+                thumbnails: thumbnails || [],
+                owner
             });
 
             await newProduct.save();

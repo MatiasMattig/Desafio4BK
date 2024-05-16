@@ -17,5 +17,8 @@ router.get("/password-error", (req, res) => {
     res.render(path.join(__dirname, "../views/passwordError.handlebars"));
 });
 
+router.post("/requestPasswordReset", userController.requestPasswordReset);
+router.post('/reset-password', userController.resetPassword);
+router.put("/premium/:uid", userController.cambiarRolPremium);
 
 module.exports = router;
