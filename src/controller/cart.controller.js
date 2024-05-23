@@ -35,7 +35,15 @@ class CartController {
         const cartId = req.params.cid;
         const productId = req.params.pid;
         const quantity = req.body.quantity || 1;
+        const userId = req.user._id; 
         try {
+            const user = await UserModel.findById(userId);
+                if (user.role === 'premium') { 
+                const product = await productService.getProductById(productId);
+            if (product.owner === user.email)  {
+                return res.status(403).json({ error: "No puedes agregar un producto que te pertenece a tu carrito como usuario premium" });
+            }
+            }
             await cartService.addProduct(cartId, productId, quantity);
             res.status(200).send("Producto agregado al carrito correctamente");
         } catch (error) {

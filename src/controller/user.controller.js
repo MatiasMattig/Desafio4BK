@@ -177,7 +177,7 @@ class UserController {
                 return res.status(404).json({ message: 'Usuario no encontrado' });
             }
     
-            const nuevoRol = user.role === 'usuario' ? 'premium' : 'usuario';
+            const nuevoRol = user.role === 'user' ? 'premium' : 'user';
     
             const actualizado = await UserModel.findByIdAndUpdate(uid, { role: nuevoRol }, { new: true });
             res.json(actualizado);

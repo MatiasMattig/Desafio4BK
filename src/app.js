@@ -46,14 +46,22 @@ app.use("/api/users", userRouter);
 app.use("/", viewsRouter);
 app.use("/mockingproducts", mockingProductsRouter);
 
-// app.get("/loggertest", (req, res) => {
-//     req.logger.error("Error fatal");
-//     req.logger.debug("Mensaje de debug");
-//     req.logger.info("Mensaje de Info");
-//     req.logger.warning("Mensaje de Warning");
-//     console.log(configObject.mongo_url);
-//     res.send("Test de logs");
-// })
+const swaggerJSDoc = require('swagger-jsdoc');
+const swaggerUiExpress = require("swagger-ui-express");
+
+const swaggerOptions = {
+    definition: {
+        openapi: "3.0.1",
+        info: {
+            title: "Documentación del proyecto de venta de productos",
+            description: "API pensada en resolver el proceso de compra de productos."
+        }
+    },
+    apis: ["./src/docs/**/*.yaml"]
+}
+
+const specs = swaggerJSDoc(swaggerOptions);
+app.use("/apidocs", swaggerUiExpress.serve, swaggerUiExpress.setup(specs));
 
 const httpServer = app.listen(PUERTO, () => {
     console.log(`Servidor escuchando en el puerto ${PUERTO}`);

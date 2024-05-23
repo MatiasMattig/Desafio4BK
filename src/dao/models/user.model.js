@@ -33,8 +33,8 @@ const userSchema = mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['admin', 'usuario', 'premium'],
-        default: 'usuario'
+        enum: ['admin', 'user', 'premium'],
+        default: 'user'
     },
     resetToken: {
         token: String,
