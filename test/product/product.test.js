@@ -8,7 +8,6 @@ describe('Pruebas de integración del módulo de productos', () => {
    let productId;
 
    before(async () => {
-      // Login y obtener token
       const credentials = { email: 'testuser@example.com', password: 'password123' };
       const response = await requester.post('/api/sessions/login').send(credentials);
       token = response.headers['set-cookie'][0].split(';')[0].split('=')[1];
