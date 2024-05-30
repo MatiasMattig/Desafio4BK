@@ -8,6 +8,7 @@ describe('Pruebas de integración del módulo de productos', () => {
    let productId;
 
    before(async () => {
+      // Login y obtener token
       const credentials = { email: 'testuser@example.com', password: 'password123' };
       const response = await requester.post('/api/sessions/login').send(credentials);
       token = response.headers['set-cookie'][0].split(';')[0].split('=')[1];
@@ -24,7 +25,7 @@ describe('Pruebas de integración del módulo de productos', () => {
       };
       const { statusCode, body } = await requester
          .post('/api/products')
-         .set('Cookie', `coderCookie=${token}`)
+         .set('Cookie', `jwt=${token}`)
          .send(ProductMock);
 
       expect(statusCode).to.be.eql(201);
@@ -46,7 +47,7 @@ describe('Pruebas de integración del módulo de productos', () => {
       };
       const { statusCode, body } = await requester
          .put(`/api/products/${productId}`)
-         .set('Cookie', `coderCookie=${token}`)
+         .set('Cookie', `jwt=${token}`)
          .send(updatedProduct);
 
       expect(statusCode).to.be.eql(200);
@@ -58,7 +59,7 @@ describe('Pruebas de integración del módulo de productos', () => {
    it('DELETE de /api/products/:pid debe eliminar un producto', async () => {
       const { statusCode } = await requester
          .delete(`/api/products/${productId}`)
-         .set('Cookie', `coderCookie=${token}`);
+         .set('Cookie', `jwt=${token}`);
       expect(statusCode).to.be.eql(204);
 
       const { statusCode: getStatusCode } = await requester.get(`/api/products/${productId}`);
