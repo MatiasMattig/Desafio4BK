@@ -11,6 +11,9 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Cart"
+              example:
+                _id: "60d21b4667d0d8992e610c85"
+                products: []
         "500":
           description: Error interno del servidor
   /api/carts/{cid}:
@@ -32,6 +35,11 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Cart"
+              example:
+                _id: "60d21b4667d0d8992e610c85"
+                products:
+                  - product: "60d21b4667d0d8992e610c85"
+                    quantity: 2
         "404":
           description: Carrito no encontrado
         "500":
@@ -60,6 +68,11 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Cart"
+              example:
+                _id: "60d21b4667d0d8992e610c85"
+                products:
+                  - product: "60d21b4667d0d8992e610c85"
+                    quantity: 2
         "404":
           description: Carrito no encontrado
         "500":
@@ -76,13 +89,32 @@ paths:
           schema:
             type: string
       responses:
-        "204":
+        "200":
           description: Carrito vaciado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+                  message:
+                    type: string
+                    example: "Todos los productos del carrito fueron eliminados correctamente"
+                  updatedCart:
+                    $ref: "#/components/schemas/Cart"
+              example:
+                status: "success"
+                message: "Todos los productos del carrito fueron eliminados correctamente"
+                updatedCart:
+                  _id: "60d21b4667d0d8992e610c85"
+                  products: []
         "404":
           description: Carrito no encontrado
         "500":
           description: Error interno del servidor
-  /api/carts/{cid}/products/{pid}:
+  /api/carts/{cid}/product/{pid}:
     post:
       summary: Agregar producto al carrito
       tags:
@@ -117,18 +149,32 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Success"
+              example:
+                status: "success"
+                message: "Producto agregado al carrito correctamente"
+                updatedCart:
+                  _id: "60d21b4667d0d8992e610c85"
+                  products:
+                    - product: "60d21b4667d0d8992e610c85"
+                      quantity: 2
         "403":
           description: No se puede agregar un producto propio al carrito
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+              example:
+                error: "No puedes agregar un producto que te pertenece a tu carrito como usuario premium"
         "404":
           description: Carrito o producto no encontrado
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+              example:
+                error: "Carrito o producto no encontrado"
+        "500":
+          description: Error interno del servidor
     delete:
       summary: Eliminar producto del carrito
       tags:
@@ -153,13 +199,23 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Success"
+              example:
+                status: "success"
+                message: "Producto eliminado del carrito correctamente"
+                updatedCart:
+                  _id: "60d21b4667d0d8992e610c85"
+                  products: []
         "404":
           description: Carrito o producto no encontrado
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
-  /api/carts/{cid}/products/{pid}/quantity:
+              example:
+                error: "Carrito o producto no encontrado"
+        "500":
+          description: Error interno del servidor
+  /api/carts/{cid}/product/{pid}/quantity:
     put:
       summary: Actualizar cantidad de un producto en el carrito
       tags:
@@ -194,12 +250,24 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Success"
+              example:
+                status: "success"
+                message: "Cantidad del producto actualizada correctamente"
+                updatedCart:
+                  _id: "60d21b4667d0d8992e610c85"
+                  products:
+                    - product: "60d21b4667d0d8992e610c85"
+                      quantity: 2
         "404":
           description: Carrito o producto no encontrado
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+              example:
+                error: "Carrito o producto no encontrado"
+        "500":
+          description: Error interno del servidor
   /api/carts/{cid}/purchase:
     post:
       summary: Finalizar compra del carrito
@@ -219,12 +287,20 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Purchase"
+              example:
+                cliente: "Juan Perez"
+                email: "juan.perez@example.com"
+                numTicket: "60d21b4667d0d8992e610c85"
         "404":
           description: Carrito no encontrado
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Error"
+              example:
+                error: "Carrito no encontrado"
+        "500":
+          description: Error interno del servidor
 
 components:
   schemas:

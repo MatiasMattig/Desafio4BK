@@ -1,0 +1,309 @@
+paths:
+  /api/users/register:
+    post:
+      summary: Registro de un nuevo usuario
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterUser"
+      responses:
+        "201":
+          description: Usuario registrado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Error en la solicitud
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Error interno del servidor
+
+  /api/users/login:
+    post:
+      summary: Autenticar un usuario
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginUser"
+      responses:
+        "200":
+          description: Autenticación exitosa
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthToken"
+        "400":
+          description: Error en la solicitud
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Error interno del servidor
+
+  /api/users/profile:
+    get:
+      summary: Obtener el perfil del usuario autenticado
+      tags:
+        - Users
+      responses:
+        "200":
+          description: Perfil del usuario obtenido correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "401":
+          description: No autorizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Error interno del servidor
+
+  /api/users/logout:
+    post:
+      summary: Cerrar sesión del usuario
+      tags:
+        - Users
+      responses:
+        "200":
+          description: Sesión cerrada correctamente
+        "500":
+          description: Error interno del servidor
+
+  /api/users/request-password-reset:
+    post:
+      summary: Solicitar restablecimiento de contraseña
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestPasswordReset"
+      responses:
+        "200":
+          description: Solicitud de restablecimiento de contraseña enviada correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "404":
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Error interno del servidor
+
+  /api/users/reset-password:
+    post:
+      summary: Restablecer la contraseña del usuario
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResetPassword"
+      responses:
+        "200":
+          description: Contraseña restablecida correctamente
+        "400":
+          description: Solicitud inválida
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Error interno del servidor
+
+  /api/users/change-role/{uid}:
+    put:
+      summary: Cambiar el rol de un usuario
+      tags:
+        - Users
+      parameters:
+        - name: uid
+          in: path
+          required: true
+          description: ID del usuario
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Rol del usuario actualizado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: Usuario no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Error interno del servidor
+
+components:
+  schemas:
+    RegisterUser:
+      type: object
+      properties:
+        first_name:
+          type: string
+          description: Nombre del usuario
+        last_name:
+          type: string
+          description: Apellido del usuario
+        email:
+          type: string
+          description: Email del usuario
+        password:
+          type: string
+          description: Contraseña del usuario
+        age:
+          type: integer
+          description: Edad del usuario
+      example:
+        first_name: "John"
+        last_name: "Doe"
+        email: "johndoe@example.com"
+        password: "securepassword"
+        age: 30
+        
+    LoginUser:
+      type: object
+      properties:
+        email:
+          type: string
+          description: Email del usuario
+        password:
+          type: string
+          description: Contraseña del usuario
+      example:
+        email: "johndoe@example.com"
+        password: "securepassword"
+        
+    AuthToken:
+      type: object
+      properties:
+        token:
+          type: string
+          description: Token de autenticación
+      example:
+        token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Mensaje de error
+      example:
+        error: "Descripción del error"
+        
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: ID del usuario
+        first_name:
+          type: string
+          description: Nombre del usuario
+        last_name:
+          type: string
+          description: Apellido del usuario
+        email:
+          type: string
+          description: Email del usuario
+        role:
+          type: string
+          description: Rol del usuario
+        age:
+          type: integer
+          description: Edad del usuario
+      example:
+        _id: "60d21b4667d0d8992e610c85"
+        first_name: "John"
+        last_name: "Doe"
+        email: "johndoe@example.com"
+        role: "user"
+        age: 30
+        
+    UserProfile:
+      type: object
+      properties:
+        first_name:
+          type: string
+          description: Nombre del usuario
+        last_name:
+          type: string
+          description: Apellido del usuario
+        role:
+          type: string
+          description: Rol del usuario
+      example:
+        first_name: "John"
+        last_name: "Doe"
+        role: "user"
+        
+    RequestPasswordReset:
+      type: object
+      properties:
+        email:
+          type: string
+          description: Email del usuario
+      example:
+        email: "johndoe@example.com"
+
+    ResetPassword:
+      type: object
+      properties:
+        email:
+          type: string
+          description: Email del usuario
+        password:
+          type: string
+          description: Nueva contraseña del usuario
+        token:
+          type: string
+          description: Token de restablecimiento de contraseña
+      example:
+        email: "johndoe@example.com"
+        password: "newsecurepassword"
+        token: "resettoken123"
+
+    SuccessResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Mensaje de éxito
+      example:
+        message: "Operación exitosa"

@@ -44,7 +44,7 @@ class UserController {
             res.redirect("/api/users/profile");
         } catch (error) {
             req.logger.error("Error al registrar usuario:", error);
-            throw new Error("Error al registrar usuario");
+            res.status(500).json({ error: "Error interno del servidor" });
         }
     }
 
@@ -69,15 +69,9 @@ class UserController {
             res.redirect("/api/users/profile");
         } catch (error) {
             req.logger.error("Error al iniciar sesión:", error);
-            throw new Error("Error al iniciar sesión");
+            res.status(500).json({ error: "Error interno del servidor" });
         }
     }
-
-    // async profile(req, res) {
-    //     const userDto = new UserDTO(req.user.first_name, req.user.last_name, req.user.role);
-    //     const isAdmin = req.user.role === 'admin';
-    //     res.render("profile", { user: userDto, isAdmin });
-    // }
 
     async profile(req, res) {
         try {
@@ -92,8 +86,12 @@ class UserController {
     }
 
     async logout(req, res) {
-        res.clearCookie("coderCookieToken");
-        res.redirect("/login");
+        try {
+            res.clearCookie("coderCookieToken");
+            res.redirect("/login");
+        } catch (error) {
+            res.status(500).json({ error: 'Error interno del servidor' });
+        }
     }
 
     async requestPasswordReset(req, res) {
@@ -121,8 +119,8 @@ class UserController {
 
             res.redirect("/confirmacion-envio");
         } catch (error) {
-            console.error(error);
-            res.status(500).send("Error interno del servidor");
+            req.logger.error("Error al solicitar restablecimiento de contraseña:", error);
+            res.status(500).json({ error: "Error interno del servidor" });
         }
     }
 
@@ -162,7 +160,7 @@ class UserController {
             // Renderizar la vista de confirmación de cambio de contraseña
             return res.redirect("/login");
         } catch (error) {
-            console.error(error);
+            req.logger.error("Error al restablecer la contraseña:", error);
             return res.status(500).render("passwordreset", { error: "Error interno del servidor" });
         }
     }
@@ -182,8 +180,8 @@ class UserController {
             const actualizado = await UserModel.findByIdAndUpdate(uid, { role: nuevoRol }, { new: true });
             res.json(actualizado);
         } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: 'Error interno del servidor' });
+            req.logger.error("Error al cambiar el rol del usuario:", error);
+            res.status(500).json({ error: 'Error interno del servidor' });
         }
     }
 }

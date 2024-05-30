@@ -4,9 +4,38 @@ paths:
       summary: Obtiene todos los productos de la BD
       tags:
         - Products
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          description: Número de productos a devolver
+          schema:
+            type: integer
+            example: 10
+        - name: sort
+          in: query
+          required: false
+          description: Ordenar los productos por un campo específico
+          schema:
+            type: string
+            example: "price"
+        - name: query
+          in: query
+          required: false
+          description: Filtrar los productos por ciertos criterios
+          schema:
+            type: string
+            example: "category=Electronics"
+        - name: page
+          in: query
+          required: false
+          description: Página de resultados a devolver
+          schema:
+            type: integer
+            example: 1
       responses:
         "200":
-          description: Obtiene todos los productos correctamente
+          description: Productos obtenidos correctamente
           content:
             application/json:
               schema:
@@ -28,6 +57,18 @@ paths:
       responses:
         "201":
           description: Producto creado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "400":
+          description: Error en la solicitud
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Error interno del servidor
   /api/products/{pid}:
     get:
       summary: Obtiene un producto por ID
@@ -49,8 +90,16 @@ paths:
                 $ref: "#/components/schemas/Product"
         "404":
           description: Producto no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
         "500":
           description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
     put:
       summary: Actualiza un producto por ID
       tags:
@@ -71,10 +120,28 @@ paths:
       responses:
         "200":
           description: Producto actualizado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "400":
+          description: Error en la solicitud
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
         "404":
           description: Producto no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
         "500":
           description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
     delete:
       summary: Elimina un producto por ID
       tags:
@@ -87,12 +154,38 @@ paths:
           schema:
             type: string
       responses:
-        "204":
+        "200":
           description: Producto eliminado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+                  message:
+                    type: string
+                    example: "Producto eliminado correctamente"
+              example:
+                status: "success"
+                message: "Producto eliminado correctamente"
         "404":
           description: Producto no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error: "Producto no encontrado"
         "500":
           description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                error: "Error al eliminar el producto"
 
 components:
   schemas:
@@ -118,6 +211,9 @@ components:
         category:
           type: string
           description: Categoría del producto
+        code:
+          type: string
+          description: Código único del producto
       example:
         _id: "60d21b4667d0d8992e610c85"
         title: "Producto de ejemplo"
@@ -125,6 +221,7 @@ components:
         price: 99.99
         stock: 10
         category: "Ejemplo"
+        code: "PROD001"
   requestBodies:
     createProduct:
       type: object
@@ -145,12 +242,16 @@ components:
         category:
           type: string
           description: Categoría del producto
+        code:
+          type: string
+          description: Código único del producto
       example:
         title: "Nuevo Producto"
         description: "Descripción del nuevo producto"
         price: 49.99
         stock: 20
         category: "Nueva Categoría"
+        code: "NEWCODE123"
     updateProduct:
       type: object
       properties:
@@ -170,9 +271,21 @@ components:
         category:
           type: string
           description: Categoría del producto
+        code:
+          type: string
+          description: Código único del producto
       example:
         title: "Producto Actualizado"
         description: "Descripción del producto actualizado"
         price: 59.99
         stock: 30
         category: "Categoría Actualizada"
+        code: "UPDATEDCODE123"
+  ErrorResponse:
+    type: object
+    properties:
+      error:
+        type: string
+        description: Mensaje de error
+    example:
+      error: "Código de producto ya existe"

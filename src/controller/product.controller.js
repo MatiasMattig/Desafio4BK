@@ -7,9 +7,10 @@ class ProductController {
         const newProduct = req.body;
         try {
             const product = await productService.addProduct(newProduct);
-            res.json(product);
+            res.status(201).json(product);
         } catch (error) {
             req.logger.error("Error al agregar un producto:", error);
+            res.status(500).json({ error: "Error al agregar un producto" });
         }
     }
 
@@ -20,6 +21,7 @@ class ProductController {
             res.json(products);
         } catch (error) { 
             req.logger.error("Error al obtener productos:", error);
+            res.status(500).json({ error: "Error al obtener productos" });
         }
     }
 
@@ -28,13 +30,14 @@ class ProductController {
         try {
             const product = await productService.getProductById(id);
             if (!product) {
-                return res.json({
+                return res.status(404).json({
                     error: "Producto no encontrado"
                 });
             }
             res.json(product);
         } catch (error) {
             req.logger.error("Error al obtener un producto por ID:", error);
+            res.status(500).json({ error: "Error al obtener un producto por ID" });
         }
     }
 
@@ -46,6 +49,7 @@ class ProductController {
             res.json(product);
         } catch (error) {
             req.logger.error("Error al actualizar un producto:", error);
+            res.status(500).json({ error: "Error al actualizar un producto" });
         }
     }
 
@@ -53,10 +57,11 @@ class ProductController {
         const id = req.params.pid;
         const user = req.user;
         try {
-            let answer = await productService.removeProduct(id, user);
-            res.json(answer);
+            await productService.removeProduct(id, user);
+            res.status(204).send();
         } catch (error) {
             req.logger.error("Error al eliminar un producto:", error);
+            res.status(500).json({ error: "Error al eliminar un producto" });
         }
     }
 }

@@ -15,6 +15,7 @@ class CartController {
             res.json(newCart);
         } catch (error) {
             req.logger.error("Error al crear un nuevo carrito:", error);
+            res.status(500).json({ error: 'Error interno del servidor' });
         }
     }
 
@@ -28,6 +29,7 @@ class CartController {
             res.json(products);
         } catch (error) {
             req.logger.error("Error al obtener productos del carrito:", error);
+            res.status(500).json({ error: 'Error interno del servidor' });
         }
     }
 
@@ -38,16 +40,17 @@ class CartController {
         const userId = req.user._id; 
         try {
             const user = await UserModel.findById(userId);
-                if (user.role === 'premium') { 
+            if (user.role === 'premium') { 
                 const product = await productService.getProductById(productId);
-            if (product.owner === user.email)  {
-                return res.status(403).json({ error: "No puedes agregar un producto que te pertenece a tu carrito como usuario premium" });
-            }
+                if (product.owner === user.email)  {
+                    return res.status(403).json({ error: "No puedes agregar un producto que te pertenece a tu carrito como usuario premium" });
+                }
             }
             await cartService.addProduct(cartId, productId, quantity);
             res.status(200).send("Producto agregado al carrito correctamente");
         } catch (error) {
             req.logger.error("Error al agregar producto al carrito:", error);
+            res.status(500).json({ error: 'Error interno del servidor' });
         }
     }
 
@@ -63,6 +66,7 @@ class CartController {
             });
         } catch (error) {
             req.logger.error("Error al eliminar producto del carrito:", error);
+            res.status(500).json({ error: 'Error interno del servidor' });
         }
     }
 
@@ -74,6 +78,7 @@ class CartController {
             res.json(updatedCart);
         } catch (error) {
             req.logger.error("Error al actualizar productos en el carrito:", error);
+            res.status(500).json({ error: 'Error interno del servidor' });
         }
     }
 
@@ -90,6 +95,7 @@ class CartController {
             });
         } catch (error) {
             req.logger.error("Error al actualizar cantidad de productos en el carrito:", error);
+            res.status(500).json({ error: 'Error interno del servidor' });
         }
     }
 
@@ -97,13 +103,14 @@ class CartController {
         const cartId = req.params.cid;
         try {
             const updatedCart = await cartService.emptyCart(cartId);
-            res.json({
+            res.status(200).json({
                 status: 'success',
                 message: 'Todos los productos del carrito fueron eliminados correctamente',
                 updatedCart,
             });
         } catch (error) {
             req.logger.error("Error al vaciar el carrito:", error);
+            res.status(500).json({ error: 'Error interno del servidor' });
         }
     }
 
@@ -144,12 +151,12 @@ class CartController {
                 cliente: userWithCart.first_name,
                 email: userWithCart.email,
                 numTicket: ticket._id 
-        });
+            });
         } catch (error) {
             req.logger.error('Error al procesar la compra:', error);
+            res.status(500).json({ error: 'Error interno del servidor' });
         }
     }
-
 }
 
 module.exports = CartController;
