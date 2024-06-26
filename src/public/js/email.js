@@ -54,6 +54,48 @@ class EmailManager {
             throw new Error("Error al enviar correo electrónico");
         }
     }
+
+    async sendInactiveAccountEmail(email, first_name) {
+        try {
+            const mailOptions = {
+                from: 'matucodea@gmail.com',
+                to: email,
+                subject: 'Cuenta Eliminada por Inactividad',
+                html: `
+                    <h1>Cuenta Eliminada</h1>
+                    <p>Hola ${first_name},</p>
+                    <p>Tu cuenta ha sido eliminada debido a la inactividad de más de 2 días.</p>
+                    <p>Si deseas volver a utilizar nuestros servicios, por favor regístrate nuevamente.</p>
+                `
+            };
+
+            await this.transporter.sendMail(mailOptions);
+        } catch (error) {
+            console.error("Error al enviar correo electrónico:", error);
+            throw new Error("Error al enviar correo electrónico");
+        }
+    }
+
+    async sendProductDeletedEmail(email, first_name, productTitle) {
+        try {
+            const mailOptions = {
+                from: 'matucodea@gmail.com',
+                to: email,
+                subject: 'Producto Eliminado',
+                html: `
+                    <h1>Producto Eliminado</h1>
+                    <p>Hola ${first_name},</p>
+                    <p>Tu producto "${productTitle}" ha sido eliminado.</p>
+                    <p>Si tienes alguna pregunta, por favor, contacta con nosotros.</p>
+                `
+            };
+    
+            await this.transporter.sendMail(mailOptions);
+        } catch (error) {
+            console.error("Error al enviar correo electrónico:", error);
+            throw new Error("Error al enviar correo electrónico");
+        }
+    }
 }
 
 module.exports = EmailManager;

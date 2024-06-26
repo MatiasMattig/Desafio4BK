@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administración de Usuarios</title>
+</head>
+<body>
+    <h1>Administración de Usuarios</h1>
+    <input type="text" id="searchInput" placeholder="Buscar por email">
+    <button onclick="searchUser()">Buscar</button>
+    <div id="userContainer"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let allUsers = [];
+
+        socket.on("users", (data) => {
+            allUsers = data;
+            renderUsers(data);
+        });
+
+        const renderUsers = (users) => {
+            const userContainer = document.getElementById("userContainer");
+            userContainer.innerHTML = "";
+
+            users.forEach(user => {
+                const userDiv = document.createElement("div");
+                userDiv.innerHTML = `
+                    <p>${user.first_name} ${user.last_name} (${user.email}) - Rol: ${user.role}</p>
+                    <select onchange="changeRole('${user._id}', this.value)">
+                        <option value="user" ${user.role === 'user' ? 'selected' : ''}>User</option>
+                        <option value="admin" ${user.role === 'admin' ? 'selected' : ''}>Admin</option>
+                        <option value="premium" ${user.role === 'premium' ? 'selected' : ''}>Premium</option>
+                    </select>
+                    <button onclick="deleteUser('${user._id}')">Eliminar</button>
+                `;
+                userContainer.appendChild(userDiv);
+            });
+        };
+
+        const changeRole = (userId, newRole) => {
+            socket.emit("changeRole", { userId, newRole });
+        };
+
+        const deleteUser = (userId) => {
+            socket.emit("deleteUser", userId);
+        };
+
+        const searchUser = () => {
+            const searchInput = document.getElementById("searchInput").value.toLowerCase();
+            const filteredUsers = allUsers.filter(user => user.email.toLowerCase().includes(searchInput));
+            renderUsers(filteredUsers);
+        };
+    </script>
+</body>
+</html>

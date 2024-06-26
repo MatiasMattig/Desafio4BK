@@ -1,21 +1,21 @@
 const { EErrors } = require("../errors/enums.js");
 const CustomError = require("../errors/customError.js");
 const ProductModel = require("../dao/models/product.model");
+const EmailManager = require("../public/js/email.js");
+const emailManager = new EmailManager();
 
 class ProductService {
     async addProduct({ title, description, price, img, code, stock, category, thumbnails, owner }) {
         try {
             if (!title || !description || !price || !code || !stock || !category) {
-                CustomError.createError({ code: EErrors.INVALID_TYPE_ERROR, message: "Todos los campos son obligatorios" });
+                throw CustomError.createError({ code: EErrors.INVALID_TYPE_ERROR, message: "Todos los campos son obligatorios" });
             }
 
-            const existsProduct = await ProductModel.findOne({ code: code });
+            const existsProduct = await ProductModel.findOne({ code });
 
             if (existsProduct) {
-                CustomError.createError({ code: EErrors.INVALID_TYPE_ERROR, message: "El código debe ser único" });
+                throw CustomError.createError({ code: EErrors.INVALID_TYPE_ERROR, message: "El código debe ser único" });
             }
-
-            console.log("Owner", owner);
 
             const newProduct = new ProductModel({
                 title,
@@ -35,14 +35,13 @@ class ProductService {
             return newProduct;
 
         } catch (error) {
-            throw error;
+            return { error: error.message };
         }
     }
 
     async getProducts(limit = 10, page = 1, sort, query) {
         try {
             const skip = (page - 1) * limit;
-
             let queryOptions = {};
 
             if (query) {
@@ -63,12 +62,9 @@ class ProductService {
                 .limit(limit);
 
             const totalProducts = await ProductModel.countDocuments(queryOptions);
-            
             const totalPages = Math.ceil(totalProducts / limit);
-            
             const hasPrevPage = page > 1;
             const hasNextPage = page < totalPages;
-            
 
             return {
                 docs: products,
@@ -82,6 +78,7 @@ class ProductService {
                 nextLink: hasNextPage ? `/api/products?limit=${limit}&page=${page + 1}&sort=${sort}&query=${query}` : null,
             };
         } catch (error) {
+            console.error("Error al obtener productos:", error);
             throw error;
         }
     }
@@ -91,40 +88,50 @@ class ProductService {
             const product = await ProductModel.findById(id);
 
             if (!product) {
-                CustomError.createError({ code: EErrors.PRODUCT_NOT_FOUND, message: "No se encontró ningún producto con este id" });
+                throw CustomError.createError({ code: EErrors.PRODUCT_NOT_FOUND, message: "No se encontró ningún producto con este id" });
             }
 
             return product;
         } catch (error) {
+            console.error("Error al obtener el producto por ID:", error);
             throw error;
         }
     }
 
     async updateProduct(id, updatedFields) {
         try {
-            const updatedProduct = await ProductModel.findByIdAndUpdate(id, updatedFields, { new: true });
-    
-            if (!updatedProduct) {
-                CustomError.createError({ code: EErrors.PRODUCT_NOT_FOUND, message: "No se encontró ningún producto con este id" });
+            const { code } = updatedFields;
+
+            // Verificar si el nuevo código ya existe en otro documento
+            const existingProduct = await ProductModel.findOne({ code, _id: { $ne: id } });
+            if (existingProduct) {
+                throw CustomError.createError({ code: EErrors.INVALID_TYPE_ERROR, message: "El código debe ser único" });
             }
-    
+
+            const updatedProduct = await ProductModel.findByIdAndUpdate(id, updatedFields, { new: true });
+
+            if (!updatedProduct) {
+                throw CustomError.createError({ code: EErrors.PRODUCT_NOT_FOUND, message: "No se encontró ningún producto con este id" });
+            }
+
             return updatedProduct;
         } catch (error) {
+            console.error("Error al actualizar el producto:", error);
             throw error;
         }
     }
-    
 
-    async removeProduct(id) {
+    async removeProduct(id, user) {
         try {
-            const deleted = await ProductModel.findByIdAndDelete(id);
+            const deletedProduct = await ProductModel.findByIdAndDelete(id);
 
-            if (!deleted) {
-                CustomError.createError({ code: EErrors.PRODUCT_NOT_FOUND, message: "No hay ningún producto con ese id" });
+            if (!deletedProduct) {
+                throw CustomError.createError({ code: EErrors.PRODUCT_NOT_FOUND, message: "No hay ningún producto con ese id" });
             }
 
-            return deleted;
+            return deletedProduct;
         } catch (error) {
+            console.error("Error al eliminar el producto:", error);
             throw error;
         }
     }

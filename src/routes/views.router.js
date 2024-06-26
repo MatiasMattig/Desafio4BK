@@ -15,8 +15,10 @@ router.get("/chat", checkUserRole(['user', 'premium']) ,viewsController.renderCh
 router.get("/", viewsController.renderHome);
 
 router.get("/reset-password", viewsController.renderResetPassword);
-router.get("/password", viewsController.renderCambioPassword);
-router.get("/confirmacion-envio", viewsController.renderConfirmacion);
+router.get("/password", viewsController.renderChangePassword);
+router.get("/confirmacion-envio", viewsController.renderConfirmation);
 router.get("/panel-premium", viewsController.renderPremium);
+
+router.get("/admin/users", checkUserRole(['admin']), passport.authenticate('jwt', { session: false }), viewsController.renderAdminUsers);
 
 module.exports = router;

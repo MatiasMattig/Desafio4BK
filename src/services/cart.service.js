@@ -9,7 +9,8 @@ class CartService {
             await newCart.save();
             return newCart;
         } catch (error) {
-            throw CustomError.createError({ code: EErrors.INTERNAL_SERVER_ERROR, message: "Error al crear el carrito" });
+            console.error("Error al crear el carrito", error);
+            throw error;
         }
     }
 
@@ -17,11 +18,12 @@ class CartService {
         try {
             const cart = await CartModel.findById(idCart);
             if (!cart) {
-                throw CustomError.createError({ code: EErrors.CART_NOT_FOUND, message: "No existe ese carrito con el ID proporcionado" });
+                CustomError.createError({ code: EErrors.CART_NOT_FOUND, message: "No existe ese carrito con el ID proporcionado" });
             }
             return cart;
         } catch (error) {
-            throw CustomError.createError({ code: EErrors.INTERNAL_SERVER_ERROR, message: "Error al obtener productos del carrito" });
+            console.error("Error al obtener productos del carrito", error);
+            throw error;
         }
     }
 
@@ -41,7 +43,8 @@ class CartService {
             await cart.save();
             return cart;
         } catch (error) {
-            throw CustomError.createError({ code: EErrors.INTERNAL_SERVER_ERROR, message: "Error al agregar producto al carrito" });
+            console.error("Error al agregar producto al carrito", error);
+            throw error;
         }
     }
 
@@ -49,13 +52,14 @@ class CartService {
         try {
             const cart = await CartModel.findById(cartId);
             if (!cart) {
-                throw CustomError.createError({ code: EErrors.CART_NOT_FOUND, message: "Carrito no encontrado" });
+                CustomError.createError({ code: EErrors.CART_NOT_FOUND, message: "Carrito no encontrado" });
             }
             cart.products = cart.products.filter(item => item.product._id.toString() !== productId);
             await cart.save();
             return cart;
         } catch (error) {
-            throw CustomError.createError({ code: EErrors.INTERNAL_SERVER_ERROR, message: "Error al eliminar producto del carrito" });
+            console.error("Error al eliminar producto del carrito", error);
+            throw error;
         }
     }
 
@@ -64,7 +68,7 @@ class CartService {
             const cart = await CartModel.findById(cartId);
 
             if (!cart) {
-                throw CustomError.createError({ code: EErrors.CART_NOT_FOUND, message: "Carrito no encontrado" });
+                CustomError.createError({ code: EErrors.CART_NOT_FOUND, message: "Carrito no encontrado" });
             }
 
             cart.products = updatedProducts;
@@ -73,7 +77,8 @@ class CartService {
             await cart.save();
             return cart;
         } catch (error) {
-            throw CustomError.createError({ code: EErrors.INTERNAL_SERVER_ERROR, message: "Error al actualizar productos en el carrito" });
+            console.error("Error al actualizar productos en el carrito", error);
+            throw error;
         }
     }
 
@@ -82,7 +87,7 @@ class CartService {
             const cart = await CartModel.findById(cartId);
 
             if (!cart) {
-                throw CustomError.createError({ code: EErrors.CART_NOT_FOUND, message: "Carrito no encontrado" });
+                CustomError.createError({ code: EErrors.CART_NOT_FOUND, message: "Carrito no encontrado" });
             }
 
             const productIndex = cart.products.findIndex(item => item._id.toString() === productId);
@@ -94,10 +99,11 @@ class CartService {
                 await cart.save();
                 return cart;
             } else {
-                throw CustomError.createError({ code: EErrors.PRODUCT_NOT_FOUND, message: "Producto no encontrado en el carrito" });
+                CustomError.createError({ code: EErrors.PRODUCT_NOT_FOUND, message: "Producto no encontrado en el carrito" });
             }
         } catch (error) {
-            throw CustomError.createError({ code: EErrors.INTERNAL_SERVER_ERROR, message: "Error al actualizar las cantidades en el carrito" });
+            console.error("Error al actualizar las cantidades en el carrito", error);
+            throw error;
         }
     }
 
@@ -110,12 +116,13 @@ class CartService {
             );
 
             if (!cart) {
-                throw CustomError.createError({ code: EErrors.CART_NOT_FOUND, message: "Carrito no encontrado" });
+                CustomError.createError({ code: EErrors.CART_NOT_FOUND, message: "Carrito no encontrado" });
             }
 
             return cart;
         } catch (error) {
-            throw CustomError.createError({ code: EErrors.INTERNAL_SERVER_ERROR, message: "Error al vaciar el carrito" });
+            console.error("Error al vaciar el carrito", error);
+            throw error;
         }
     }
 }

@@ -1,8 +1,9 @@
 const ProductService = require("../services/product.service.js");
+const EmailManager = require("../public/js/email.js");
 const productService = new ProductService();
+const emailManager = new EmailManager();
 
 class ProductController {
-
     async addProduct(req, res) {
         const newProduct = req.body;
         try {
@@ -19,7 +20,7 @@ class ProductController {
             let { limit = 10, page = 1, sort, query } = req.query;
             const products = await productService.getProducts(limit, page, sort, query);
             res.json(products);
-        } catch (error) { 
+        } catch (error) {
             req.logger.error("Error al obtener productos:", error);
             res.status(500).json({ error: "Error al obtener productos" });
         }
@@ -30,9 +31,7 @@ class ProductController {
         try {
             const product = await productService.getProductById(id);
             if (!product) {
-                return res.status(404).json({
-                    error: "Producto no encontrado"
-                });
+                return res.status(404).json({ error: "Producto no encontrado" });
             }
             res.json(product);
         } catch (error) {
@@ -48,8 +47,13 @@ class ProductController {
             const product = await productService.updateProduct(id, productUpdated);
             res.json(product);
         } catch (error) {
-            req.logger.error("Error al actualizar un producto:", error);
-            res.status(500).json({ error: "Error al actualizar un producto" });
+            if (error.code === EErrors.INVALID_TYPE_ERROR) {
+                req.logger.error("Error al actualizar un producto: el código debe ser único");
+                res.status(400).json({ error: "El código debe ser único" });
+            } else {
+                req.logger.error("Error al actualizar un producto:", error);
+                res.status(500).json({ error: "Error al actualizar un producto" });
+            }
         }
     }
 
@@ -57,7 +61,12 @@ class ProductController {
         const id = req.params.pid;
         const user = req.user;
         try {
-            await productService.removeProduct(id, user);
+            const deletedProduct = await productService.removeProduct(id, user);
+
+            if (user.role === 'premium' && deletedProduct.owner === user.email) {
+                await emailManager.sendProductDeletedEmail(user.email, user.first_name, deletedProduct.title);
+            }
+
             res.status(204).send();
         } catch (error) {
             req.logger.error("Error al eliminar un producto:", error);

@@ -9,6 +9,16 @@ socket.on("products", (data) => {
     renderProducts(data);
 });
 
+///////////////////////////////////
+socket.on('error', (message) => {
+    Swal.fire({
+        title: 'Error',
+        text: message,
+        icon: 'error'
+    });
+});
+///////////////////////////////////
+
 // Función para renderizar nuestros productos
 const renderProducts = (products) => {
     const productContainer = document.getElementById("productContainer");

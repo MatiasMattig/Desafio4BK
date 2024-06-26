@@ -165,7 +165,7 @@ class UserController {
         }
     }
 
-    async cambiarRolPremium(req, res) {
+    async changeRolePremium(req, res) {
         try {
             const { uid } = req.params;
     
@@ -175,13 +175,54 @@ class UserController {
                 return res.status(404).json({ message: 'Usuario no encontrado' });
             }
     
-            const nuevoRol = user.role === 'user' ? 'premium' : 'user';
+            const newRole = user.role === 'user' ? 'premium' : 'user';
     
-            const actualizado = await UserModel.findByIdAndUpdate(uid, { role: nuevoRol }, { new: true });
-            res.json(actualizado);
+            const updated = await UserModel.findByIdAndUpdate(uid, { role: newRole }, { new: true });
+            res.json(updated);
         } catch (error) {
             req.logger.error("Error al cambiar el rol del usuario:", error);
             res.status(500).json({ error: 'Error interno del servidor' });
+        }
+    }
+
+    async getAllUsers(req, res) {
+        try {
+            const users = await UserModel.find({}, 'first_name last_name email role');
+            res.json(users);
+        } catch (error) {
+            req.logger.error("Error al obtener todos los usuarios:", error);
+            res.status(500).json({ error: "Error interno del servidor" });
+        }
+    }
+
+    async deleteInactiveUsers(req, res) {
+        try {
+            const twoDaysAgo = new Date();
+            twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+
+            const usersToDelete = await UserModel.find({
+                role: 'user',
+                lastConnection: { $lt: twoDaysAgo }
+            });
+
+            const emailPromises = usersToDelete.map(async (user) => {
+                try {
+                    await emailManager.sendInactiveAccountEmail(user.email, user.first_name);
+                } catch (error) {
+                    req.logger.error(`Error al enviar correo electrónico a ${user.email}:`, error);
+                }
+            });
+
+            await Promise.all(emailPromises);
+            const result = await UserModel.deleteMany({
+                role: 'user',
+                lastConnection: { $lt: twoDaysAgo }
+            });
+
+            res.json({ message: `Se han eliminado ${result.deletedCount} usuarios inactivos.` });
+        } catch (error) {
+            req.logger.error("Error al eliminar usuarios inactivos:", error);
+            res.status(500).json({ error: "Error interno del servidor" });
         }
     }
 }

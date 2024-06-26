@@ -1,3 +1,4 @@
+const UserModel = require("../dao/models/user.model.js");
 const ProductModel = require("../dao/models/product.model.js");
 const CartService = require("../services/cart.service.js");
 const cartService = new CartService();
@@ -107,16 +108,26 @@ class ViewsController {
         res.render("passwordreset");
     }
 
-    async renderCambioPassword(req, res) {
-        res.render("passwordcambio");
+    async renderChangePassword(req, res) {
+        res.render("passwordchange");
     }
 
-    async renderConfirmacion(req, res) {
-        res.render("confirmacion-envio");
+    async renderConfirmation(req, res) {
+        res.render("confirmation-envio");
     }
 
     async renderPremium(req, res) {
         res.render("panel-premium");
+    }
+
+    async renderAdminUsers(req, res) {
+        try {
+            const users = await UserModel.find();
+            res.render("adminUsers", { users });
+        } catch (error) {
+            req.logger.error("Error al obtener usuarios:", error);
+            throw new Error("Error al obtener usuarios");
+        }
     }
 }
 

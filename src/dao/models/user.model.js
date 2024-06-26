@@ -39,6 +39,10 @@ const userSchema = mongoose.Schema({
     resetToken: {
         token: String,
         expiresAt: Date
+    },
+    lastConnection: {
+        type: Date,
+        default: Date.now
     }
 });
 
