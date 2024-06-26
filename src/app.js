@@ -6,6 +6,7 @@ const passport = require("passport");
 const initializePassport = require("./config/passport.config.js");
 const addLogger = require("./utils/logger.js");
 const configObject = require("./config/config.js");
+const dotenv = require("dotenv");
 const cors = require("cors");
 const path = require('path');
 const PUERTO = 8080;
@@ -16,6 +17,8 @@ const cartsRouter = require("./routes/carts.router.js");
 const viewsRouter = require("./routes/views.router.js");
 const userRouter = require("./routes/user.router.js");
 const mockingProductsRouter = require("./routes/mockingProducts.router.js");
+
+dotenv.config();
 
 //Middleware
 app.use(express.urlencoded({ extended: true }));
@@ -69,4 +72,7 @@ const httpServer = app.listen(PUERTO, () => {
 
 ///Websockets: 
 const SocketManager = require("./sockets/socketmanager.js");
+const { default: mongoose } = require("mongoose");
 new SocketManager(httpServer);
+
+const connection = mongoose.connect(process.env.MONGO_URL)
