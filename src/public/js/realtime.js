@@ -37,10 +37,6 @@ const renderProducts = (products) => {
 
         productContainer.appendChild(card);
 
-        // card.querySelector(".btn-remove").addEventListener("click", () => {
-        //     removeProduct(item._id);
-        // });
-
         card.querySelector(".btn-remove").addEventListener("click", () => {
             if (role === "premium" && item.owner === email) {
                 removeProduct(item._id);
@@ -53,12 +49,6 @@ const renderProducts = (products) => {
                 })
             }
         });
-
-        // card.querySelector(".btn-update").addEventListener("click", () => {
-        //     const productId = card.querySelector(".btn-update").dataset.id;
-        //     const productToUpdate = products.docs.find(product => product._id === productId);
-        //     openUpdateForm(productToUpdate);
-        // });
 
         card.querySelector(".btn-update").addEventListener("click", () => {
             const productId = card.querySelector(".btn-update").dataset.id;
